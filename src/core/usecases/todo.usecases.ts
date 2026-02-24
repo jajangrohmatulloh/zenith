@@ -1,4 +1,4 @@
-import { Todo } from '../domain/todo.entity';
+import { Todo, RepeatType, SubTask } from '../domain/todo.entity';
 import { ITodoRepository } from '../domain/todo.repository';
 
 export class TodoUseCases {
@@ -8,17 +8,36 @@ export class TodoUseCases {
         return await this.todoRepository.getAll(userId);
     }
 
-    async addTodo(userId: string, text: string, dueDate?: number): Promise<Todo> {
-        if (!text.trim()) {
-            throw new Error('Todo text cannot be empty');
+    async addTodo(
+        userId: string,
+        title: string,
+        params: {
+            description?: string;
+            dueDate?: number;
+            dueTime?: string;
+            repeat?: RepeatType;
+            repeatInterval?: number;
+            repeatEndDate?: number;
+            subtasks?: SubTask[];
+        } = {}
+    ): Promise<Todo> {
+        if (!title.trim()) {
+            throw new Error('Task title cannot be empty');
         }
 
         const newTodo: Todo = {
             id: crypto.randomUUID(),
-            text: text.trim(),
+            text: title.trim(), // Keep text for backward compatibility
+            title: title.trim(),
+            description: params.description,
             completed: false,
             createdAt: Date.now(),
-            dueDate,
+            dueDate: params.dueDate,
+            dueTime: params.dueTime,
+            repeat: params.repeat || 'none',
+            repeatInterval: params.repeatInterval,
+            repeatEndDate: params.repeatEndDate,
+            subtasks: params.subtasks || [],
             userId,
         };
 
@@ -38,16 +57,17 @@ export class TodoUseCases {
         await this.todoRepository.delete(id);
     }
 
-    async updateTodo(userId: string, id: string, text: string): Promise<void> {
-        if (!text.trim()) {
-            throw new Error('Todo text cannot be empty');
-        }
+    async updateTodo(userId: string, id: string, updates: Partial<Todo>): Promise<void> {
         const todos = await this.todoRepository.getAll(userId);
         const todo = todos.find(t => t.id === id);
         if (todo) {
-            await this.todoRepository.update({ ...todo, text: text.trim() });
+            if (updates.title !== undefined || updates.text !== undefined) {
+                const newTitle = (updates.title || updates.text || '').trim();
+                if (!newTitle) throw new Error('Task title cannot be empty');
+                updates.text = newTitle;
+                updates.title = newTitle;
+            }
+            await this.todoRepository.update({ ...todo, ...updates });
         }
     }
-
-
 }

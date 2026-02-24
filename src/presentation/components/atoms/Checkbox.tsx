@@ -12,7 +12,7 @@ export const Checkbox = ({ checked, className, ...props }: CheckboxProps) => {
             <input
                 type="checkbox"
                 className={cn(
-                    'peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg cursor-pointer transition-all checked:bg-indigo-600 checked:border-indigo-600 dark:border-slate-700',
+                    'peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg cursor-pointer transition-all checked:bg-indigo-600 checked:border-indigo-600 dark:border-slate-600',
                     className
                 )}
                 checked={checked}

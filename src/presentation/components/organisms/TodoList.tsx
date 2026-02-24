@@ -7,6 +7,7 @@ import { useTodo } from '../../context/todo-context';
 
 import { TodoItem } from '../molecules/TodoItem';
 import { Badge } from '../atoms/Badge';
+import { isTaskOnDate } from '../../../core/utils/date.utils';
 
 export const TodoList = () => {
     const { todos, loading, selectedDate, setSelectedDate } = useTodo();
@@ -14,10 +15,8 @@ export const TodoList = () => {
 
     const filteredTodos = todos.filter((todo) => {
         // First filter by selected date if applicable
-        if (selectedDate) {
-            if (!todo.dueDate) return false;
-            const todoDate = new Date(todo.dueDate).setHours(0, 0, 0, 0);
-            if (todoDate !== selectedDate) return false;
+        if (selectedDate && !isTaskOnDate(todo, selectedDate)) {
+            return false;
         }
 
         // Then filter by status
@@ -53,7 +52,7 @@ export const TodoList = () => {
                             onClick={() => setFilter(f)}
                             className={`text-sm font-bold capitalize transition-all ${filter === f
                                 ? 'text-indigo-600 dark:text-indigo-400 underline decoration-2 underline-offset-8'
-                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100'
                                 }`}
                         >
                             {f}
@@ -69,7 +68,7 @@ export const TodoList = () => {
                             onClick={() => setSelectedDate(null)}
                         >
                             <span>{new Date(selectedDate).toLocaleDateString()}</span>
-                            <X className="w-3 h-3" />
+                            <X className="w-3 h-3 text-indigo-600 dark:text-indigo-300" />
                         </div>
                     )}
                     <Badge variant="primary">{stats.total} {selectedDate ? 'Found' : 'Total'}</Badge>
@@ -89,7 +88,7 @@ export const TodoList = () => {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-400"
+                        className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-300"
                     >
                         <p className="text-sm font-medium">No tasks found in this category.</p>
                     </motion.div>

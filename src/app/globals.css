@@ -19,7 +19,7 @@
 
 .dark {
   --background: #020617;
-  --foreground: #f1f5f9;
+  --foreground: #ffffff;
 }
 
 
@@ -39,4 +39,9 @@ body {
 ::selection {
   background: rgba(79, 70, 229, 0.2);
   color: #4f46e5;
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
 }

@@ -20,7 +20,7 @@ export const Button = ({
     const variants = {
         primary: 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md transition-all active:scale-95',
         secondary: 'bg-slate-200 text-slate-800 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700',
-        ghost: 'bg-transparent hover:bg-slate-100 text-slate-600 dark:text-slate-400 dark:hover:bg-slate-800',
+        ghost: 'bg-transparent hover:bg-slate-100 text-slate-600 dark:text-slate-300 dark:hover:bg-slate-800',
         danger: 'bg-red-500 text-white hover:bg-red-600 transition-all active:scale-95',
     };
 

@@ -12,10 +12,18 @@ interface TodoContextType {
     loading: boolean;
     selectedDate: number | null;
     setSelectedDate: (date: number | null) => void;
-    addTodo: (text: string, dueDate?: number) => Promise<void>;
+    addTodo: (title: string, params?: {
+        description?: string;
+        dueDate?: number;
+        dueTime?: string;
+        repeat?: Todo['repeat'];
+        repeatInterval?: number;
+        repeatEndDate?: number;
+        subtasks?: Todo['subtasks'];
+    }) => Promise<void>;
     toggleTodo: (id: string) => Promise<void>;
     deleteTodo: (id: string) => Promise<void>;
-    updateTodo: (id: string, text: string) => Promise<void>;
+    updateTodo: (id: string, updates: Partial<Todo>) => Promise<void>;
 }
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
@@ -34,15 +42,15 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     const repository = user ? supabaseRepository : localStorageRepository;
     const useCases = new TodoUseCases(repository);
 
-    const fetchTodos = async () => {
-        setLoading(true);
+    const fetchTodos = async (background = false) => {
+        if (!background) setLoading(true);
         try {
             const data = await useCases.getTodos(currentUserId);
             setTodos(data);
         } catch (error) {
             console.error('Failed to fetch todos:', error instanceof Error ? error.message : error);
         } finally {
-            setLoading(false);
+            if (!background) setLoading(false);
         }
     };
 
@@ -50,10 +58,10 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
         fetchTodos();
     }, [user]);
 
-    const addTodo = async (text: string, dueDate?: number) => {
+    const addTodo = async (title: string, params: any = {}) => {
         try {
-            await useCases.addTodo(currentUserId, text, dueDate);
-            await fetchTodos();
+            await useCases.addTodo(currentUserId, title, params);
+            await fetchTodos(true);
         } catch (error) {
             alert(error instanceof Error ? error.message : 'Failed to add todo');
         }
@@ -62,7 +70,7 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     const toggleTodo = async (id: string) => {
         try {
             await useCases.toggleTodo(currentUserId, id);
-            await fetchTodos();
+            await fetchTodos(true);
         } catch (error) {
             alert(error instanceof Error ? error.message : 'Failed to toggle todo');
         }
@@ -72,17 +80,17 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     const deleteTodo = async (id: string) => {
         try {
             await useCases.deleteTodo(id);
-            await fetchTodos();
+            await fetchTodos(true);
         } catch (error) {
             alert(error instanceof Error ? error.message : 'Failed to delete todo');
         }
     };
 
 
-    const updateTodo = async (id: string, text: string) => {
+    const updateTodo = async (id: string, updates: Partial<Todo>) => {
         try {
-            await useCases.updateTodo(currentUserId, id, text);
-            await fetchTodos();
+            await useCases.updateTodo(currentUserId, id, updates);
+            await fetchTodos(true);
         } catch (error) {
             alert(error instanceof Error ? error.message : 'Failed to update todo');
         }
