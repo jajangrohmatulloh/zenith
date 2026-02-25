@@ -19,6 +19,7 @@ export class TodoUseCases {
             repeatInterval?: number;
             repeatEndDate?: number;
             subtasks?: SubTask[];
+            order?: number;
         } = {}
     ): Promise<Todo> {
         if (!title.trim()) {
@@ -39,6 +40,7 @@ export class TodoUseCases {
             repeatEndDate: params.repeatEndDate,
             subtasks: params.subtasks || [],
             userId,
+            order: params.order,
         };
 
         await this.todoRepository.add(newTodo);

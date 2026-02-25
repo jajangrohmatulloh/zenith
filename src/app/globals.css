@@ -41,7 +41,10 @@ body {
   color: #4f46e5;
 }
 
-.dark input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
+::-webkit-calendar-picker-indicator {
   cursor: pointer;
+}
+
+.dark ::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }

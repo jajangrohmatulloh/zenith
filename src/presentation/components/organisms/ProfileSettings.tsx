@@ -6,7 +6,7 @@ import { supabase } from '@/infrastructure/supabase';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, CheckCircle2, AlertCircle, ArrowLeft, Sparkles } from 'lucide-react';
+import { User, Mail, Lock, CheckCircle2, AlertCircle, ArrowLeft, Mountain } from 'lucide-react';
 
 interface ProfileSettingsProps {
     onBack: () => void;
@@ -20,6 +20,12 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+    // Check if form has changes
+    const hasChanges = firstName !== user?.user_metadata?.first_name || 
+                       lastName !== user?.user_metadata?.last_name || 
+                       email !== user?.email || 
+                       password.trim() !== '';
 
     useEffect(() => {
         if (user) {
@@ -84,7 +90,7 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={onBack}
-                        className="p-2 rounded-xl text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                        className="p-2 rounded-xl text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
                     >
                         <ArrowLeft className="w-5 h-5" />
                     </button>
@@ -104,7 +110,7 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                             <Input
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
-                                className="pl-12"
+                                className="pl-12 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
                                 placeholder="John"
                             />
                         </div>
@@ -116,7 +122,7 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                             <Input
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
-                                className="pl-12"
+                                className="pl-12 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
                                 placeholder="Doe"
                             />
                         </div>
@@ -131,7 +137,7 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="pl-12"
+                            className="pl-12 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
                             placeholder="name@example.com"
                         />
                     </div>
@@ -146,7 +152,7 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="pl-12"
+                            className="pl-12 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
                             placeholder="••••••••"
                         />
                     </div>
@@ -170,17 +176,30 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                 <div className="pt-4 flex flex-col sm:flex-row gap-3">
                     <Button
                         type="submit"
-                        className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold h-12 rounded-2xl shadow-lg shadow-indigo-500/20"
-                        disabled={loading}
+                        className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold h-12 rounded-2xl shadow-lg shadow-indigo-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+                        disabled={loading || !hasChanges}
                     >
-                        {loading ? 'Saving Changes...' : 'Save Profile Changes'}
-                        <Sparkles className="w-4 h-4 ml-2" />
+                        {loading ? (
+                            <>
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                                Saving...
+                            </>
+                        ) : (
+                            <>
+                                {message?.type === 'success' ? (
+                                    <CheckCircle2 className="w-4 h-4 ml-2" />
+                                ) : (
+                                    <Mountain className="w-4 h-4 ml-2" />
+                                )}
+                                {message?.type === 'success' ? 'Saved!' : 'Save Profile Changes'}
+                            </>
+                        )}
                     </Button>
                     <Button
                         type="button"
                         variant="ghost"
                         onClick={onBack}
-                        className="sm:px-8 rounded-2xl"
+                        className="sm:px-8 rounded-2xl cursor-pointer"
                     >
                         Cancel
                     </Button>

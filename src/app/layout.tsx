@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zenith | Premium Task Manager",
+  title: "Zenith | Task Manager",
   description: "Elevate your daily flow with peak efficiency and surgical precision.",
 
 };

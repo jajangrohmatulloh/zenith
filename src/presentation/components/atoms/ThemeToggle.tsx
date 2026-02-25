@@ -15,7 +15,7 @@ export const ThemeToggle = () => {
             variant="secondary"
             size="icon"
             onClick={toggleTheme}
-            className="relative w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border-none shadow-none"
+            className="relative w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border-none shadow-none cursor-pointer"
         >
             <AnimatePresence mode="wait" initial={false}>
                 <motion.div

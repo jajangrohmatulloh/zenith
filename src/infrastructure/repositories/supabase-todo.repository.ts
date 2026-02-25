@@ -8,7 +8,7 @@ export class SupabaseTodoRepository implements ITodoRepository {
             .from('todos')
             .select('*')
             .eq('userId', userId)
-            .order('createdAt', { ascending: false });
+            .order('order', { ascending: true, nullsFirst: false });
 
         if (error) {
             throw new Error(`Supabase Fetch Error: ${error.message} (${error.code})`);

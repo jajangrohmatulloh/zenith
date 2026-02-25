@@ -4,9 +4,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { TodoForm } from '../organisms/TodoForm';
 import { TodoList } from '../organisms/TodoList';
-import { Sparkles } from 'lucide-react';
+import { Mountain } from 'lucide-react';
 import { ThemeToggle } from '../atoms/ThemeToggle';
 import { CalendarView } from '../organisms/CalendarView';
+import { ProTip } from '../molecules/ProTip';
 import { useAuth } from '@/presentation/context/auth-context';
 import { LogOut, User as UserIcon, Settings } from 'lucide-react';
 import { ProfileSettings } from '../organisms/ProfileSettings';
@@ -29,7 +30,7 @@ export const HomeTemplate = ({ onLoginToggle }: HomeTemplateProps) => {
                         <>
                             <button
                                 onClick={() => setShowProfile(!showProfile)}
-                                className="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/40 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/80 shadow-sm hover:scale-105 transition-all text-slate-600 dark:text-slate-200"
+                                className="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/40 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/80 shadow-sm hover:scale-105 transition-all text-slate-600 dark:text-slate-200 cursor-pointer"
                             >
                                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                                 <span className="text-xs font-bold">
@@ -39,14 +40,14 @@ export const HomeTemplate = ({ onLoginToggle }: HomeTemplateProps) => {
                             <ThemeToggle />
                             <button
                                 onClick={() => setShowProfile(!showProfile)}
-                                className={`p-3 rounded-2xl backdrop-blur-md border border-slate-200/50 dark:border-slate-700/80 transition-all hover:scale-105 ${showProfile ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-white/40 dark:bg-slate-900/60 text-slate-600 dark:text-slate-300'}`}
+                                className={`p-3 rounded-2xl backdrop-blur-md border border-slate-200/50 dark:border-slate-700/80 transition-all hover:scale-105 cursor-pointer ${showProfile ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-white/40 dark:bg-slate-900/60 text-slate-600 dark:text-slate-300'}`}
                                 title="Settings"
                             >
                                 <Settings className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={() => signOut()}
-                                className="p-3 rounded-2xl bg-white/40 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:text-red-500 dark:hover:text-red-400 transition-all hover:scale-105"
+                                className="p-3 rounded-2xl bg-white/40 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:text-red-500 dark:hover:text-red-400 transition-all hover:scale-105 cursor-pointer"
                                 title="Sign Out"
                             >
                                 <LogOut className="w-5 h-5" />
@@ -57,7 +58,7 @@ export const HomeTemplate = ({ onLoginToggle }: HomeTemplateProps) => {
                             <ThemeToggle />
                             <button
                                 onClick={onLoginToggle}
-                                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95"
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                             >
                                 <UserIcon className="w-4 h-4" />
                                 Sign In
@@ -73,7 +74,7 @@ export const HomeTemplate = ({ onLoginToggle }: HomeTemplateProps) => {
                     className="text-center mb-16"
                 >
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100/80 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 text-xs font-bold mb-4 backdrop-blur-sm">
-                        <Sparkles className="w-3 h-3" />
+                        <Mountain className="w-3 h-3" />
                         <span>ZENITH • TASK MANAGER</span>
                     </div>
 
@@ -101,12 +102,7 @@ export const HomeTemplate = ({ onLoginToggle }: HomeTemplateProps) => {
                         <>
                             <div className="lg:col-span-4 flex flex-col gap-6">
                                 <CalendarView />
-                                <div className="hidden lg:block bg-white/40 dark:bg-slate-900/80 p-6 rounded-3xl border border-slate-200 dark:border-slate-700/80 backdrop-blur-xl">
-                                    <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-2">Pro Tip</h4>
-                                    <p className="text-xs text-slate-500 dark:text-slate-300 leading-relaxed">
-                                        Double-click any task to edit its title instantly. Your changes are saved automatically.
-                                    </p>
-                                </div>
+                                <ProTip />
                             </div>
 
                             <div className="lg:col-span-8 bg-white/60 dark:bg-slate-900/90 backdrop-blur-2xl border border-white/20 dark:border-slate-800/50 rounded-[32px] p-6 md:p-10 shadow-2xl shadow-indigo-500/10 dark:shadow-black/40">

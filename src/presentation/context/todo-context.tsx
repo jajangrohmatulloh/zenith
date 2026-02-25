@@ -24,6 +24,7 @@ interface TodoContextType {
     toggleTodo: (id: string) => Promise<void>;
     deleteTodo: (id: string) => Promise<void>;
     updateTodo: (id: string, updates: Partial<Todo>) => Promise<void>;
+    reorderTodos: (activeId: string, overId: string) => Promise<void>;
 }
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
@@ -46,7 +47,13 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
         if (!background) setLoading(true);
         try {
             const data = await useCases.getTodos(currentUserId);
-            setTodos(data);
+            
+            // Initialize order for todos that don't have it (backward compatibility)
+            const todosWithOrder = data.map((todo, index) => 
+                todo.order === undefined ? { ...todo, order: index } : todo
+            );
+            
+            setTodos(todosWithOrder);
         } catch (error) {
             console.error('Failed to fetch todos:', error instanceof Error ? error.message : error);
         } finally {
@@ -60,7 +67,9 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
 
     const addTodo = async (title: string, params: any = {}) => {
         try {
-            await useCases.addTodo(currentUserId, title, params);
+            // Assign order to the end of the list
+            const newOrder = todos.length;
+            await useCases.addTodo(currentUserId, title, { ...params, order: newOrder });
             await fetchTodos(true);
         } catch (error) {
             alert(error instanceof Error ? error.message : 'Failed to add todo');
@@ -68,10 +77,18 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const toggleTodo = async (id: string) => {
+        // Optimistic update - update UI immediately
+        const updatedTodos = todos.map(todo => 
+            todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        );
+        setTodos(updatedTodos);
+        
         try {
             await useCases.toggleTodo(currentUserId, id);
-            await fetchTodos(true);
+            await fetchTodos(true); // Sync with backend
         } catch (error) {
+            // Revert on error
+            setTodos(todos);
             alert(error instanceof Error ? error.message : 'Failed to toggle todo');
         }
     };
@@ -96,9 +113,38 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const reorderTodos = async (activeId: string, overId: string) => {
+        try {
+            const oldIndex = todos.findIndex((todo) => todo.id === activeId);
+            const newIndex = todos.findIndex((todo) => todo.id === overId);
+            
+            if (oldIndex === -1 || newIndex === -1) return;
+            
+            // Create new array with reordered items
+            const newTodos = [...todos];
+            const [removed] = newTodos.splice(oldIndex, 1);
+            newTodos.splice(newIndex, 0, removed);
+            
+            // Assign new order values to ALL todos (not just filtered ones)
+            const updatedTodos = newTodos.map((todo, index) => ({
+                ...todo,
+                order: index,
+            }));
+            
+            // Batch update all todos
+            for (const todo of updatedTodos) {
+                await useCases.updateTodo(currentUserId, todo.id, { order: todo.order } as Partial<Todo>);
+            }
+            
+            setTodos(updatedTodos);
+        } catch (error) {
+            console.error('Failed to reorder todos:', error);
+        }
+    };
+
 
     return (
-        <TodoContext.Provider value={{ todos, loading, selectedDate, setSelectedDate, addTodo, toggleTodo, deleteTodo, updateTodo }}>
+        <TodoContext.Provider value={{ todos, loading, selectedDate, setSelectedDate, addTodo, toggleTodo, deleteTodo, updateTodo, reorderTodos }}>
             {children}
         </TodoContext.Provider>
     );

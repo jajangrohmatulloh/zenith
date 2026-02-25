@@ -2,11 +2,11 @@ import React from 'react';
 import { cn } from './Button';
 import { Check } from 'lucide-react';
 
-interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
     checked: boolean;
 }
 
-export const Checkbox = ({ checked, className, ...props }: CheckboxProps) => {
+export const Checkbox = ({ checked, onChange, className, ...props }: CheckboxProps) => {
     return (
         <div className="relative inline-flex items-center">
             <input
@@ -16,6 +16,7 @@ export const Checkbox = ({ checked, className, ...props }: CheckboxProps) => {
                     className
                 )}
                 checked={checked}
+                onChange={onChange}
                 {...props}
             />
             <Check
