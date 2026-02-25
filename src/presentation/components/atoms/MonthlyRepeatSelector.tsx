@@ -28,17 +28,17 @@ export const MonthlyRepeatSelector = ({
     onWeekDayChange,
 }: MonthlyRepeatSelectorProps) => {
     return (
-        <div className="space-y-3">
+        <div className="space-y-2">
             {/* Type Selector */}
             <div className="flex gap-2">
                 <button
                     type="button"
                     onClick={() => onTypeChange('byDate')}
                     className={cn(
-                        "flex-1 py-2 rounded-xl text-xs font-bold transition-all border",
+                        "flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all border",
                         monthlyType === 'byDate'
                             ? "bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/30"
-                            : "bg-white/50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-700 text-slate-400 hover:border-indigo-500/50"
+                            : "bg-white/50 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-300 hover:border-indigo-500/50"
                     )}
                 >
                     By Date
@@ -47,10 +47,10 @@ export const MonthlyRepeatSelector = ({
                     type="button"
                     onClick={() => onTypeChange('byWeekday')}
                     className={cn(
-                        "flex-1 py-2 rounded-xl text-xs font-bold transition-all border",
+                        "flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all border",
                         monthlyType === 'byWeekday'
                             ? "bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/30"
-                            : "bg-white/50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-700 text-slate-400 hover:border-indigo-500/50"
+                            : "bg-white/50 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-300 hover:border-indigo-500/50"
                     )}
                 >
                     By Weekday
@@ -59,8 +59,8 @@ export const MonthlyRepeatSelector = ({
 
             {/* By Date Option */}
             {monthlyType === 'byDate' && (
-                <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500 dark:text-slate-400">Day</span>
+                <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Day</label>
                     <DayOfMonthDropdown
                         value={dayOfMonth}
                         onChange={onDayOfMonthChange}
@@ -71,15 +71,15 @@ export const MonthlyRepeatSelector = ({
             {/* By Weekday Option */}
             {monthlyType === 'byWeekday' && (
                 <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-500 dark:text-slate-400">Occurrence</span>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Occurrence</label>
                         <OccurrenceDropdown
                             value={weekOccurrence}
                             onChange={onWeekOccurrenceChange}
                         />
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-500 dark:text-slate-400">Weekday</span>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Weekday</label>
                         <WeekdayDropdown
                             value={weekDay}
                             onChange={onWeekDayChange}

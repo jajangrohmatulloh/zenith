@@ -12,6 +12,7 @@ import { DatePicker } from '../atoms/DatePicker';
 import { NumberInput } from '../atoms/NumberInput';
 import { WeekDaySelector } from '../atoms/WeekDaySelector';
 import { MonthlyRepeatSelector } from '../atoms/MonthlyRepeatSelector';
+import { ConfirmDialog } from '../atoms/ConfirmDialog';
 import { cn } from '../atoms/Button';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -42,6 +43,7 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
     const [editRepeatMonthlyOccurrence, setEditRepeatMonthlyOccurrence] = useState<number | 'last'>(todo.repeatMonthlyWeekOccurrence || 1);
     const [editRepeatMonthlyWeekDay, setEditRepeatMonthlyWeekDay] = useState<number>(todo.repeatMonthlyWeekDay || 0);
     const [newSubtask, setNewSubtask] = useState('');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const {
         attributes,
@@ -81,8 +83,16 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
     };
 
     const doDelete = () => {
-        if (onDeleteOverride) onDeleteOverride(todo.id);
-        else deleteTodo(todo.id);
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmDelete = () => {
+        if (onDeleteOverride) {
+            onDeleteOverride(todo.id);
+        } else {
+            deleteTodo(todo.id);
+        }
+        setShowDeleteConfirm(false);
     };
 
     const doUpdate = (updates: Partial<Todo | SubTask>) => {
@@ -108,6 +118,7 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                 repeatMonthlyDay: editRepeat === 'monthly' && editRepeatMonthlyType === 'byDate' ? editRepeatMonthlyDay : undefined,
                 repeatMonthlyWeekOccurrence: editRepeat === 'monthly' && editRepeatMonthlyType === 'byWeekday' ? editRepeatMonthlyOccurrence : undefined,
                 repeatMonthlyWeekDay: editRepeat === 'monthly' && editRepeatMonthlyType === 'byWeekday' ? editRepeatMonthlyWeekDay : undefined,
+                repeatYearlyType: editRepeat === 'yearly' ? 'byDate' : undefined,
             });
             setIsEditing(false);
         }
@@ -139,15 +150,15 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
         ? new Date(todo.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
         : null;
 
-    return (
+    const todoContent = (
         <motion.div
             ref={isDraggable ? setNodeRef : undefined}
             style={isDraggable ? style : undefined}
             layout
             layoutId={todo.id}
             initial={{ opacity: 0, scale: 0.98, y: 10 }}
-            animate={{ 
-                opacity: isDragging ? 0 : 1, 
+            animate={{
+                opacity: isDragging ? 0 : 1,
                 scale: 1,
                 y: 0,
             }}
@@ -266,17 +277,13 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                 <Edit2 className="w-4 h-4" />
                             </Button>
                         )}
-                        <Button 
-                            size="icon" 
-                            variant="ghost" 
-                            onClick={(e) => { 
-                                e.stopPropagation(); 
-                                if (isSubtask && onDeleteOverride) {
-                                    onDeleteOverride(todo.id);
-                                } else {
-                                    deleteTodo(todo.id);
-                                }
-                            }} 
+                        <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                doDelete();
+                            }}
                             className="h-8 w-8 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 cursor-pointer"
                         >
                             <Trash2 className="w-4 h-4" />
@@ -334,7 +341,7 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                                 <Repeat className="w-2.5 h-2.5" /> Repeat
                                             </label>
                                             <div className="flex gap-2">
-                                                {(['none', 'daily', 'weekly', 'monthly'] as const).map((type) => (
+                                                {(['none', 'daily', 'weekly', 'monthly', 'yearly'] as const).map((type) => (
                                                     <button
                                                         key={type}
                                                         type="button"
@@ -371,7 +378,7 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                                                 max={999}
                                                             />
                                                             <span className="text-xs text-slate-500 font-medium capitalize">
-                                                                {editRepeat === 'daily' ? 'days' : editRepeat === 'weekly' ? 'weeks' : editRepeat === 'monthly' ? 'months' : 'years'}
+                                                                {editRepeat === 'daily' ? 'days' : editRepeat === 'weekly' ? 'weeks' : editRepeat === 'monthly' ? 'months' : editRepeat === 'yearly' ? 'years' : 'days'}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -408,6 +415,15 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                                         </div>
                                                     )}
 
+                                                    {/* Yearly */}
+                                                    {editRepeat === 'yearly' && (
+                                                        <div className="space-y-2">
+                                                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                                Repeats every year on the same date as the task date.
+                                                            </p>
+                                                        </div>
+                                                    )}
+
                                                     <div className="space-y-2">
                                                         <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
                                                             <Calendar className="w-2.5 h-2.5" /> Ends On (Optional)
@@ -420,6 +436,32 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                                         />
                                                     </div>
                                                 </div>
+                                            )}
+
+                                            {/* Editor Actions */}
+                                            {isEditing && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    className="flex justify-end gap-3 pt-4 border-t border-slate-200/60 dark:border-slate-800/60"
+                                                >
+                                                    <Button
+                                                        size="sm"
+                                                        variant="secondary"
+                                                        onClick={() => setIsEditing(false)}
+                                                        className="rounded-xl px-4 h-10 cursor-pointer"
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={handleUpdate}
+                                                        disabled={!editText.trim()}
+                                                        className="rounded-xl px-6 h-10 shadow-lg shadow-indigo-500/20 active:scale-95 transition-transform font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+                                                    >
+                                                        <Check className="w-4 h-4 mr-2" /> Save Details
+                                                    </Button>
+                                                </motion.div>
                                             )}
                                         </div>
                                     </div>
@@ -571,37 +613,30 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                     </div>
                                 </div>
                             )}
-
-                            {/* Editor Actions */}
-                            {isEditing && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="flex justify-end gap-3 pt-4 border-t border-slate-200/60 dark:border-slate-800/60"
-                                >
-                                    <Button 
-                                        size="sm" 
-                                        variant="secondary" 
-                                        onClick={() => setIsEditing(false)} 
-                                        className="rounded-xl px-4 h-10 cursor-pointer"
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button 
-                                        size="sm" 
-                                        onClick={handleUpdate}
-                                        disabled={!editText.trim()}
-                                        className="rounded-xl px-6 h-10 shadow-lg shadow-indigo-500/20 active:scale-95 transition-transform font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
-                                    >
-                                        <Check className="w-4 h-4 mr-2" /> Save Details
-                                    </Button>
-                                </motion.div>
-                            )}
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
         </motion.div>
     );
-};
 
+    return (
+        <>
+            {todoContent}
+            {/* Delete Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={showDeleteConfirm}
+                title={isSubtask ? 'Delete Subtask?' : 'Delete Task?'}
+                message={isSubtask
+                    ? 'Are you sure you want to delete this subtask? This action cannot be undone.'
+                    : 'Are you sure you want to delete this task? All subtasks will also be deleted.'
+                }
+                confirmText="Delete"
+                cancelText="Cancel"
+                variant="danger"
+                onConfirm={confirmDelete}
+                onCancel={() => setShowDeleteConfirm(false)}
+            />
+        </>
+    );
+};

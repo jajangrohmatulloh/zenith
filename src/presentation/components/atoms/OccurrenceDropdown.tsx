@@ -37,14 +37,14 @@ export const OccurrenceDropdown = ({ value, onChange }: OccurrenceDropdownProps)
     const selectedLabel = occurrences.find(o => o.value === value)?.label || '';
 
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative w-full" ref={dropdownRef}>
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-1 appearance-none bg-transparent px-2 py-0.5 text-xs font-bold text-slate-900 dark:text-slate-100 transition-all cursor-pointer focus:outline-none hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-lg"
+                className="flex items-center justify-between w-full px-3 py-2 text-xs font-bold bg-white/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-700/60 rounded-xl text-slate-800 dark:text-slate-100 cursor-pointer hover:border-indigo-500/50 transition-all"
             >
-                {selectedLabel}
-                <ChevronDown className="w-3 h-3" />
+                <span className="truncate">{selectedLabel}</span>
+                <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", isOpen ? "rotate-180" : "")} />
             </button>
 
             <AnimatePresence>
@@ -54,7 +54,7 @@ export const OccurrenceDropdown = ({ value, onChange }: OccurrenceDropdownProps)
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute left-0 top-full mt-2 w-28 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 z-[9999] overflow-hidden"
+                        className="absolute left-0 top-full mt-2 w-full bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 z-[9999] overflow-hidden"
                         style={{
                             scrollbarWidth: 'thin',
                             scrollbarColor: 'rgb(148, 163, 184) transparent'

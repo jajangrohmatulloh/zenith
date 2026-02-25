@@ -49,6 +49,7 @@ export const TodoForm = () => {
                 repeatMonthlyDay: repeat === 'monthly' && repeatMonthlyType === 'byDate' ? repeatMonthlyDay : undefined,
                 repeatMonthlyWeekOccurrence: repeat === 'monthly' && repeatMonthlyType === 'byWeekday' ? repeatMonthlyOccurrence : undefined,
                 repeatMonthlyWeekDay: repeat === 'monthly' && repeatMonthlyType === 'byWeekday' ? repeatMonthlyWeekDay : undefined,
+                repeatYearlyType: repeat === 'yearly' ? 'byDate' : undefined,
                 subtasks: subtasks.length > 0 ? subtasks : undefined,
             });
             // Reset state
@@ -231,6 +232,15 @@ export const TodoForm = () => {
                                                         weekDay={repeatMonthlyWeekDay}
                                                         onWeekDayChange={setRepeatMonthlyWeekDay}
                                                     />
+                                                </div>
+                                            )}
+
+                                            {/* Yearly */}
+                                            {repeat === 'yearly' && (
+                                                <div className="space-y-2">
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                        Repeats every year on the same date as the task date.
+                                                    </p>
                                                 </div>
                                             )}
 
