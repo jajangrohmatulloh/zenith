@@ -316,8 +316,8 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                         />
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                                    <Calendar className="w-2.5 h-2.5" /> Date
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                                    Date
                                                 </label>
                                                 <DatePicker
                                                     value={editDate}
@@ -326,8 +326,8 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                                    <Clock className="w-2.5 h-2.5" /> Time
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                                    Time
                                                 </label>
                                                 <TimePicker
                                                     value={editTime}
@@ -337,8 +337,8 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                             </div>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                                <Repeat className="w-2.5 h-2.5" /> Repeat
+                                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                                Repeat
                                             </label>
                                             <div className="flex gap-2">
                                                 {(['none', 'daily', 'weekly', 'monthly', 'yearly'] as const).map((type) => (
@@ -367,8 +367,8 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                             {editRepeat !== 'none' && (
                                                 <div className="space-y-3 pt-2">
                                                     <div className="space-y-2">
-                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                                            <Repeat className="w-2.5 h-2.5" /> Repeats Every
+                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                                            Repeats Every
                                                         </label>
                                                         <div className="flex items-center gap-2">
                                                             <NumberInput
@@ -386,8 +386,8 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                                     {/* Weekly: Select Days */}
                                                     {editRepeat === 'weekly' && (
                                                         <div className="space-y-2">
-                                                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                                                <Calendar className="w-2.5 h-2.5" /> On Days
+                                                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                                                On Days
                                                             </label>
                                                             <WeekDaySelector
                                                                 value={editRepeatWeekDays}
@@ -399,8 +399,8 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                                     {/* Monthly: By Date or By Weekday */}
                                                     {editRepeat === 'monthly' && (
                                                         <div className="space-y-2">
-                                                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                                                <Calendar className="w-2.5 h-2.5" /> Repeat On
+                                                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                                                Repeat On
                                                             </label>
                                                             <MonthlyRepeatSelector
                                                                 monthlyType={editRepeatMonthlyType}
@@ -425,8 +425,8 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                                     )}
 
                                                     <div className="space-y-2">
-                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                                            <Calendar className="w-2.5 h-2.5" /> Ends On (Optional)
+                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                                            Ends On (Optional)
                                                         </label>
                                                         <DatePicker
                                                             value={editRepeatEndDate}

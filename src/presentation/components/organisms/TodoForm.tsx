@@ -30,51 +30,81 @@ export const TodoForm = () => {
     const [subtasks, setSubtasks] = useState<{ id: string; text: string; title: string; completed: boolean; createdAt: number }[]>([]);
     const [newSubtask, setNewSubtask] = useState('');
     const [isExpanded, setIsExpanded] = useState(false);
+    const [error, setError] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (title.trim()) {
-            const dueDate = date ? new Date(date).getTime() : undefined;
-            const repeatEndDateMs = repeatEndDate ? new Date(repeatEndDate).getTime() : undefined;
+        setError('');
 
-            addTodo(title, {
-                description: description.trim() || undefined,
-                dueDate,
-                dueTime: time || undefined,
-                repeat,
-                repeatInterval: repeat !== 'none' ? repeatInterval : undefined,
-                repeatEndDate: repeat !== 'none' ? repeatEndDateMs : undefined,
-                repeatWeekDays: repeat === 'weekly' && repeatWeekDays.length > 0 ? repeatWeekDays : undefined,
-                repeatMonthlyType: repeat === 'monthly' ? repeatMonthlyType : undefined,
-                repeatMonthlyDay: repeat === 'monthly' && repeatMonthlyType === 'byDate' ? repeatMonthlyDay : undefined,
-                repeatMonthlyWeekOccurrence: repeat === 'monthly' && repeatMonthlyType === 'byWeekday' ? repeatMonthlyOccurrence : undefined,
-                repeatMonthlyWeekDay: repeat === 'monthly' && repeatMonthlyType === 'byWeekday' ? repeatMonthlyWeekDay : undefined,
-                repeatYearlyType: repeat === 'yearly' ? 'byDate' : undefined,
-                subtasks: subtasks.length > 0 ? subtasks : undefined,
-            });
-            // Reset state
-            setTitle('');
-            setDescription('');
-            setDate('');
-            setTime('');
-            setRepeat('none');
-            setRepeatInterval(1);
-            setRepeatEndDate('');
-            setRepeatWeekDays([]);
-            setRepeatMonthlyType('byDate');
-            setRepeatMonthlyDay(1);
-            setRepeatMonthlyOccurrence(1);
-            setRepeatMonthlyWeekDay(0);
-            setSubtasks([]);
-            setIsExpanded(false);
+        // Validation
+        if (!title.trim()) {
+            setError('Task title is required');
+            return;
         }
+
+        if (title.trim().length > 100) {
+            setError('Task title must be less than 100 characters');
+            return;
+        }
+
+        if (repeatEndDate && date && new Date(repeatEndDate) < new Date(date)) {
+            setError('End date cannot be before the start date');
+            return;
+        }
+
+        if (repeat === 'weekly' && repeatWeekDays.length === 0) {
+            setError('Please select at least one day for weekly repeat');
+            return;
+        }
+
+        const dueDate = date ? new Date(date).getTime() : undefined;
+        const repeatEndDateMs = repeatEndDate ? new Date(repeatEndDate).getTime() : undefined;
+
+        addTodo(title, {
+            description: description.trim() || undefined,
+            dueDate,
+            dueTime: time || undefined,
+            repeat,
+            repeatInterval: repeat !== 'none' ? repeatInterval : undefined,
+            repeatEndDate: repeat !== 'none' ? repeatEndDateMs : undefined,
+            repeatWeekDays: repeat === 'weekly' && repeatWeekDays.length > 0 ? repeatWeekDays : undefined,
+            repeatMonthlyType: repeat === 'monthly' ? repeatMonthlyType : undefined,
+            repeatMonthlyDay: repeat === 'monthly' && repeatMonthlyType === 'byDate' ? repeatMonthlyDay : undefined,
+            repeatMonthlyWeekOccurrence: repeat === 'monthly' && repeatMonthlyType === 'byWeekday' ? repeatMonthlyOccurrence : undefined,
+            repeatMonthlyWeekDay: repeat === 'monthly' && repeatMonthlyType === 'byWeekday' ? repeatMonthlyWeekDay : undefined,
+            repeatYearlyType: repeat === 'yearly' ? 'byDate' : undefined,
+            subtasks: subtasks.length > 0 ? subtasks : undefined,
+        });
+
+        // Reset state
+        setTitle('');
+        setDescription('');
+        setDate('');
+        setTime('');
+        setRepeat('none');
+        setRepeatInterval(1);
+        setRepeatEndDate('');
+        setRepeatWeekDays([]);
+        setRepeatMonthlyType('byDate');
+        setRepeatMonthlyDay(1);
+        setRepeatMonthlyOccurrence(1);
+        setRepeatMonthlyWeekDay(0);
+        setSubtasks([]);
+        setIsExpanded(false);
     };
 
     const addSubtask = () => {
-        if (newSubtask.trim()) {
-            setSubtasks([...subtasks, { id: crypto.randomUUID(), text: newSubtask.trim(), title: newSubtask.trim(), completed: false, createdAt: Date.now() }]);
-            setNewSubtask('');
+        if (!newSubtask.trim()) {
+            setError('Subtask cannot be empty');
+            return;
         }
+        if (subtasks.length >= 50) {
+            setError('Maximum 50 subtasks allowed');
+            return;
+        }
+        setError('');
+        setSubtasks([...subtasks, { id: crypto.randomUUID(), text: newSubtask.trim(), title: newSubtask.trim(), completed: false, createdAt: Date.now() }]);
+        setNewSubtask('');
     };
 
     const removeSubtask = (id: string) => {
@@ -120,6 +150,16 @@ export const TodoForm = () => {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden space-y-4"
                     >
+                        {/* Error Message */}
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 text-xs font-medium"
+                            >
+                                {error}
+                            </motion.div>
+                        )}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Description</label>
@@ -134,8 +174,8 @@ export const TodoForm = () => {
                             <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                            <Calendar className="w-2.5 h-2.5" /> Date
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                            Date
                                         </label>
                                         <DatePicker
                                             value={date}
@@ -144,8 +184,8 @@ export const TodoForm = () => {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                            <Clock className="w-2.5 h-2.5" /> Time
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                            Time
                                         </label>
                                         <TimePicker
                                             value={time}
@@ -156,8 +196,8 @@ export const TodoForm = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                        <Repeat className="w-2.5 h-2.5" /> Repeat
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                        Repeat
                                     </label>
                                     <div className="flex gap-2">
                                         {(['none', 'daily', 'weekly', 'monthly', 'yearly'] as const).map((type) => (
@@ -187,8 +227,8 @@ export const TodoForm = () => {
                                     {repeat !== 'none' && (
                                         <div className="space-y-3 pt-2">
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                                    <Repeat className="w-2.5 h-2.5" /> Repeats Every
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                                    Repeats Every
                                                 </label>
                                                 <div className="flex items-center gap-2">
                                                     <NumberInput
@@ -206,8 +246,8 @@ export const TodoForm = () => {
                                             {/* Weekly: Select Days */}
                                             {repeat === 'weekly' && (
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                                        <Calendar className="w-2.5 h-2.5" /> On Days
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                                        On Days
                                                     </label>
                                                     <WeekDaySelector
                                                         value={repeatWeekDays}
@@ -219,8 +259,8 @@ export const TodoForm = () => {
                                             {/* Monthly: By Date or By Weekday */}
                                             {repeat === 'monthly' && (
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                                        <Calendar className="w-2.5 h-2.5" /> Pattern
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                                        Pattern
                                                     </label>
                                                     <MonthlyRepeatSelector
                                                         monthlyType={repeatMonthlyType}
@@ -245,8 +285,8 @@ export const TodoForm = () => {
                                             )}
 
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                                    <Calendar className="w-2.5 h-2.5" /> Ends On (Optional)
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                                    Ends On (Optional)
                                                 </label>
                                                 <DatePicker
                                                     value={repeatEndDate}
@@ -262,8 +302,8 @@ export const TodoForm = () => {
                         </div>
 
                         <div className="space-y-3 pt-2 border-t border-slate-200/50 dark:border-slate-800/50">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
-                                <ListPlus className="w-3 h-3" /> Subtasks
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                                Subtasks
                             </label>
 
                             <div className="flex gap-2">
