@@ -2,6 +2,9 @@
 
 import React from 'react';
 import { cn } from './Button';
+import { OccurrenceDropdown } from './OccurrenceDropdown';
+import { WeekdayDropdown } from './WeekdayDropdown';
+import { DayOfMonthDropdown } from './DayOfMonthDropdown';
 
 interface MonthlyRepeatSelectorProps {
     monthlyType: 'byDate' | 'byWeekday';
@@ -13,24 +16,6 @@ interface MonthlyRepeatSelectorProps {
     weekDay: number;
     onWeekDayChange: (day: number) => void;
 }
-
-const weekDays = [
-    { value: 0, label: 'Sunday' },
-    { value: 1, label: 'Monday' },
-    { value: 2, label: 'Tuesday' },
-    { value: 3, label: 'Wednesday' },
-    { value: 4, label: 'Thursday' },
-    { value: 5, label: 'Friday' },
-    { value: 6, label: 'Saturday' },
-];
-
-const occurrences = [
-    { value: 1, label: 'First' },
-    { value: 2, label: 'Second' },
-    { value: 3, label: 'Third' },
-    { value: 4, label: 'Fourth' },
-    { value: 'last', label: 'Last' },
-];
 
 export const MonthlyRepeatSelector = ({
     monthlyType,
@@ -76,18 +61,10 @@ export const MonthlyRepeatSelector = ({
             {monthlyType === 'byDate' && (
                 <div className="flex items-center gap-2">
                     <span className="text-xs text-slate-500 dark:text-slate-400">Day</span>
-                    <select
+                    <DayOfMonthDropdown
                         value={dayOfMonth}
-                        onChange={(e) => onDayOfMonthChange(e.target.value === 'last' ? 'last' : parseInt(e.target.value, 10))}
-                        className="flex-1 bg-white/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-700/60 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
-                    >
-                        {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                            <option key={day} value={day}>
-                                Day {day}
-                            </option>
-                        ))}
-                        <option value="last">Last day of month</option>
-                    </select>
+                        onChange={onDayOfMonthChange}
+                    />
                 </div>
             )}
 
@@ -96,31 +73,17 @@ export const MonthlyRepeatSelector = ({
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <span className="text-xs text-slate-500 dark:text-slate-400">Occurrence</span>
-                        <select
+                        <OccurrenceDropdown
                             value={weekOccurrence}
-                            onChange={(e) => onWeekOccurrenceChange(e.target.value === 'last' ? 'last' : parseInt(e.target.value, 10))}
-                            className="flex-1 bg-white/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-700/60 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
-                        >
-                            {occurrences.map((occ) => (
-                                <option key={occ.label} value={occ.value}>
-                                    {occ.label}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={onWeekOccurrenceChange}
+                        />
                     </div>
                     <div className="flex items-center gap-2">
                         <span className="text-xs text-slate-500 dark:text-slate-400">Weekday</span>
-                        <select
+                        <WeekdayDropdown
                             value={weekDay}
-                            onChange={(e) => onWeekDayChange(parseInt(e.target.value, 10))}
-                            className="flex-1 bg-white/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-700/60 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
-                        >
-                            {weekDays.map((day) => (
-                                <option key={day.label} value={day.value}>
-                                    {day.label}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={onWeekDayChange}
+                        />
                     </div>
                 </div>
             )}

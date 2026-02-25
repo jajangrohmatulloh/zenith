@@ -234,7 +234,7 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                                     <span className="ml-0.5">{['1st', '2nd', '3rd', '4th', 'Last'][todo.repeatMonthlyWeekOccurrence === 'last' ? 4 : todo.repeatMonthlyWeekOccurrence - 1]}{['S', 'M', 'T', 'W', 'T', 'F', 'S'][todo.repeatMonthlyWeekDay]}</span>
                                                 )}
                                                 {todo.repeat === 'monthly' && todo.repeatMonthlyType === 'byDate' && todo.repeatMonthlyDay && (
-                                                    <span className="ml-0.5">D{todo.repeatMonthlyDay}</span>
+                                                    <span className="ml-0.5">{todo.repeatMonthlyDay === 'last' ? 'Last' : `D${todo.repeatMonthlyDay}`}</span>
                                                 )}
                                             </span>
                                         </div>
