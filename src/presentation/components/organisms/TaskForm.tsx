@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Clock, Repeat, ListPlus, ChevronDown, ChevronUp, X, Calendar } from 'lucide-react';
-import { useTodo } from '../../context/todo-context';
+import { useTask } from '../../context/task-context';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { TimePicker } from '../atoms/TimePicker';
@@ -13,8 +13,8 @@ import { MonthlyRepeatSelector } from '../atoms/MonthlyRepeatSelector';
 import { cn } from '../atoms/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const TodoForm = () => {
-    const { addTodo } = useTodo();
+export const TaskForm = () => {
+    const { addTask } = useTask();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [date, setDate] = useState('');
@@ -57,13 +57,13 @@ export const TodoForm = () => {
             return;
         }
 
-        const dueDate = date ? new Date(date).getTime() : undefined;
+        const taskDate = date ? new Date(date).getTime() : undefined;
         const repeatEndDateMs = repeatEndDate ? new Date(repeatEndDate).getTime() : undefined;
 
-        addTodo(title, {
+        addTask(title, {
             description: description.trim() || undefined,
-            dueDate,
-            dueTime: time || undefined,
+            date: taskDate,
+            time: time || undefined,
             repeat,
             repeatInterval: repeat !== 'none' ? repeatInterval : undefined,
             repeatEndDate: repeat !== 'none' ? repeatEndDateMs : undefined,

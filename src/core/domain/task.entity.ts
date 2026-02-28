@@ -5,8 +5,8 @@ export interface SubTask {
     description?: string;
     completed: boolean;
     createdAt?: number;
-    dueDate?: number;
-    dueTime?: string;
+    date?: number;
+    time?: string;
     repeat?: RepeatType;
     repeatInterval?: number;
     repeatEndDate?: number;
@@ -18,15 +18,14 @@ export type MonthlyRepeatType = 'byDate' | 'byWeekday'; // byDate = 15th of mont
 export type WeekOccurrence = 1 | 2 | 3 | 4 | 'last'; // First, Second, Third, Fourth, Last
 export type MonthlyDay = number | 'last'; // 1-31 or 'last' for last day of month
 
-export interface Todo {
+export interface Task {
     id: string;
-    text: string; // Keep for backward compatibility (maps to title)
-    title?: string; // Explicit title
+    title: string; // Task title
     description?: string;
     completed: boolean;
     createdAt: number;
-    dueDate?: number; // timestamp (date only)
-    dueTime?: string; // HH:mm format
+    date?: number; // timestamp (date only)
+    time?: string; // HH:mm format
     repeat?: RepeatType;
     repeatInterval?: number;
     repeatEndDate?: number;
@@ -35,6 +34,9 @@ export interface Todo {
     repeatMonthlyDay?: MonthlyDay; // For monthly byDate: which day of month (1-31 or 'last')
     repeatMonthlyWeekOccurrence?: WeekOccurrence; // For monthly byWeekday: which occurrence (1,2,3,4,last)
     repeatMonthlyWeekDay?: WeekDay; // For monthly byWeekday: which weekday (0-6)
+    repeatYearlyType?: string; // For yearly: byDate or byWeekday
+    repeatYearlyMonth?: number; // For yearly: which month (0-11)
+    repeatYearlyDay?: MonthlyDay; // For yearly byDate: which day
     subtasks?: SubTask[];
     userId?: string;
     order?: number; // For custom ordering

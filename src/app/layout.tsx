@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 
-import { TodoProvider } from "@/presentation/context/todo-context";
+import { TaskProvider } from "@/presentation/context/task-context";
 import { ThemeProvider } from "@/presentation/context/theme-context";
 import { AuthProvider } from "@/presentation/context/auth-context";
 
@@ -34,9 +34,9 @@ export default function RootLayout({
       <body className="antialiased font-sans transition-colors duration-300">
         <ThemeProvider>
           <AuthProvider>
-            <TodoProvider>
+            <TaskProvider>
               {children}
-            </TodoProvider>
+            </TaskProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -5,9 +5,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { DndContext, DragEndEvent, DragOverlay, useSensor, useSensors, PointerSensor, MeasuringStrategy, DefaultDropAnimation, Modifier, DragStartEvent, DragMoveEvent, DragCancelEvent, rectIntersection } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
-import { useTodo } from '../../context/todo-context';
+import { useTask } from '../../context/task-context';
 
-import { TodoItem } from '../molecules/TodoItem';
+import { TaskItem } from '../molecules/TaskItem';
 import { Badge } from '../atoms/Badge';
 import { cn } from '../atoms/Button';
 import { isTaskOnDate } from '../../../core/utils/date.utils';
@@ -23,8 +23,8 @@ const createCursorModifier = (offsetY: number) => {
     return modifier;
 };
 
-export const TodoList = () => {
-    const { todos, loading, selectedDate, setSelectedDate, reorderTodos } = useTodo();
+export const TaskList = () => {
+    const { tasks, loading, selectedDate, setSelectedDate, reorderTasks } = useTask();
     const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
     const [activeId, setActiveId] = useState<string | null>(null);
     const [cursorOffset, setCursorOffset] = useState(0);
@@ -63,27 +63,27 @@ export const TodoList = () => {
         }
     };
 
-    // Calculate stats from ALL todos (before filtering)
+    // Calculate stats from ALL tasks (before filtering)
     const stats = {
-        total: todos.length,
-        active: todos.filter(t => !t.completed).length,
-        completed: todos.filter(t => t.completed).length,
+        total: tasks.length,
+        active: tasks.filter(t => !t.completed).length,
+        completed: tasks.filter(t => t.completed).length,
     };
 
-    const filteredTodos = todos.filter((todo) => {
+    const filteredTasks = tasks.filter((task) => {
         // First filter by selected date if applicable
-        if (selectedDate && !isTaskOnDate(todo, selectedDate)) {
+        if (selectedDate && !isTaskOnDate(task, selectedDate)) {
             return false;
         }
 
         // Then filter by status
-        if (filter === 'active') return !todo.completed;
-        if (filter === 'completed') return todo.completed;
+        if (filter === 'active') return !task.completed;
+        if (filter === 'completed') return task.completed;
         return true;
     });
 
     // Sort by order if available, otherwise by createdAt
-    const sortedTodos = [...filteredTodos].sort((a, b) => {
+    const sortedTasks = [...filteredTasks].sort((a, b) => {
         if (a.order !== undefined && b.order !== undefined) {
             return a.order - b.order;
         }
@@ -94,7 +94,7 @@ export const TodoList = () => {
         const { active, over } = event;
 
         if (over && active.id !== over.id) {
-            reorderTodos(active.id as string, over.id as string);
+            reorderTasks(active.id as string, over.id as string);
         }
         setActiveId(null);
     };
@@ -103,8 +103,8 @@ export const TodoList = () => {
         setActiveId(null);
     };
 
-    // Find the active todo for the overlay
-    const activeTodo = activeId ? sortedTodos.find(t => t.id === activeId) : null;
+    // Find the active task for the overlay
+    const activeTask = activeId ? sortedTasks.find(t => t.id === activeId) : null;
 
 
     if (loading) {
@@ -161,7 +161,7 @@ export const TodoList = () => {
             </div>
 
             <div className="flex flex-col gap-3 min-h-[300px]">
-                <DndContext 
+                <DndContext
                     collisionDetection={rectIntersection}
                     onDragStart={handleDragStart}
                     onDragEnd={handleDragEnd}
@@ -169,26 +169,26 @@ export const TodoList = () => {
                     sensors={sensors}
                     measuring={measuring}
                 >
-                    <SortableContext items={sortedTodos.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                    <SortableContext items={sortedTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                         <AnimatePresence mode="popLayout" initial={false}>
-                            {sortedTodos.map((todo) => (
-                                <TodoItem key={todo.id} todo={todo} isDraggable />
+                            {sortedTasks.map((task) => (
+                                <TaskItem key={task.id} task={task} isDraggable />
                             ))}
                         </AnimatePresence>
                     </SortableContext>
-                    <DragOverlay 
+                    <DragOverlay
                         dropAnimation={dropAnimation}
                         modifiers={[createCursorModifier(cursorOffset)]}
                     >
-                        {activeTodo ? (
+                        {activeTask ? (
                             <div className="transform scale-105 shadow-xl">
-                                <TodoItem todo={activeTodo} isDraggable />
+                                <TaskItem task={activeTask} isDraggable />
                             </div>
                         ) : null}
                     </DragOverlay>
                 </DndContext>
 
-                {filteredTodos.length === 0 && (
+                {filteredTasks.length === 0 && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}

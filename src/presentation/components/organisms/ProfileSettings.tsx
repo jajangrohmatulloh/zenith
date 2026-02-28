@@ -6,7 +6,7 @@ import { supabase } from '@/infrastructure/supabase';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, CheckCircle2, AlertCircle, ArrowLeft, Mountain } from 'lucide-react';
+import { User, Mail, Lock, AlertCircle, ArrowLeft, Mountain } from 'lucide-react';
 
 interface ProfileSettingsProps {
     onBack: () => void;
@@ -186,11 +186,6 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                             </>
                         ) : (
                             <>
-                                {message?.type === 'success' ? (
-                                    <CheckCircle2 className="w-4 h-4 ml-2" />
-                                ) : (
-                                    <Mountain className="w-4 h-4 ml-2" />
-                                )}
                                 {message?.type === 'success' ? 'Saved!' : 'Save Profile Changes'}
                             </>
                         )}

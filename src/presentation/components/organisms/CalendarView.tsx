@@ -7,11 +7,11 @@ import { Button } from '../atoms/Button';
 import { cn } from '../atoms/Button';
 import { YearDropdown } from '../atoms/YearDropdown';
 import { MonthDropdown } from '../atoms/MonthDropdown';
-import { useTodo } from '../../context/todo-context';
+import { useTask } from '../../context/task-context';
 import { isTaskOnDate } from '../../../core/utils/date.utils';
 
 export const CalendarView = () => {
-    const { todos, selectedDate, setSelectedDate } = useTodo();
+    const { tasks, selectedDate, setSelectedDate } = useTask();
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const daysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
@@ -31,9 +31,9 @@ export const CalendarView = () => {
         setSelectedDate(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime());
     };
 
-    const getDayTodos = (day: number) => {
+    const getDayTasks = (day: number) => {
         const d = new Date(year, month, day).setHours(0, 0, 0, 0);
-        return todos.filter(t => isTaskOnDate(t, d));
+        return tasks.filter(t => isTaskOnDate(t, d));
     };
 
     const handleDateClick = (day: number) => {
@@ -106,7 +106,7 @@ export const CalendarView = () => {
                 ))}
                 {Array.from({ length: days }).map((_, i) => {
                     const day = i + 1;
-                    const dayTodos = getDayTodos(day);
+                    const dayTasks = getDayTasks(day);
                     const timestamp = new Date(year, month, day).setHours(0, 0, 0, 0);
                     const isToday = new Date().toDateString() === new Date(year, month, day).toDateString();
                     const isSelected = selectedDate === timestamp;
@@ -125,7 +125,7 @@ export const CalendarView = () => {
                             )}
                         >
                             {day}
-                            {dayTodos.length > 0 && !isSelected && (
+                            {dayTasks.length > 0 && !isSelected && (
                                 <span className={cn(
                                     'absolute bottom-1 w-1 h-1 rounded-full',
                                     isToday ? 'bg-indigo-600 dark:bg-indigo-400' : 'bg-indigo-400'

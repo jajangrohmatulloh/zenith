@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Edit2, Check, X, Clock, Repeat, ListPlus, ChevronDown, ChevronUp, Calendar, GripVertical, Plus } from 'lucide-react';
-import { Todo, SubTask, RepeatType } from '../../../core/domain/todo.entity';
-import { useTodo } from '../../context/todo-context';
+import { Task, SubTask, RepeatType } from '../../../core/domain/task.entity';
+import { useTask } from '../../context/task-context';
 import { Checkbox } from '../atoms/Checkbox';
 import { Button } from '../atoms/Button';
 import { TimePicker } from '../atoms/TimePicker';
@@ -17,31 +17,31 @@ import { cn } from '../atoms/Button';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-interface TodoItemProps {
-    todo: Todo | SubTask;
+interface TaskItemProps {
+    task: Task | SubTask;
     isSubtask?: boolean;
     onToggleOverride?: (id: string) => void;
-    onUpdateOverride?: (id: string, updates: Partial<Todo | SubTask>) => void;
+    onUpdateOverride?: (id: string, updates: Partial<Task | SubTask>) => void;
     onDeleteOverride?: (id: string) => void;
     isDraggable?: boolean;
 }
 
-export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, onDeleteOverride, isDraggable = false }: TodoItemProps) => {
-    const { toggleTodo, deleteTodo, updateTodo } = useTodo();
+export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, onDeleteOverride, isDraggable = false }: TaskItemProps) => {
+    const { toggleTask, deleteTask, updateTask } = useTask();
     const [isEditing, setIsEditing] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
-    const [editText, setEditText] = useState(todo.title || todo.text);
-    const [editDesc, setEditDesc] = useState(todo.description || '');
-    const [editDate, setEditDate] = useState(todo.dueDate ? new Date(todo.dueDate).toISOString().split('T')[0] : '');
-    const [editTime, setEditTime] = useState(todo.dueTime || '');
-    const [editRepeat, setEditRepeat] = useState<RepeatType>(todo.repeat || 'none');
-    const [editRepeatInterval, setEditRepeatInterval] = useState(todo.repeatInterval || 1);
-    const [editRepeatEndDate, setEditRepeatEndDate] = useState(todo.repeatEndDate ? new Date(todo.repeatEndDate).toISOString().split('T')[0] : '');
-    const [editRepeatWeekDays, setEditRepeatWeekDays] = useState<number[]>(todo.repeatWeekDays || []);
-    const [editRepeatMonthlyType, setEditRepeatMonthlyType] = useState<'byDate' | 'byWeekday'>(todo.repeatMonthlyType || 'byDate');
-    const [editRepeatMonthlyDay, setEditRepeatMonthlyDay] = useState(todo.repeatMonthlyDay || 1);
-    const [editRepeatMonthlyOccurrence, setEditRepeatMonthlyOccurrence] = useState<number | 'last'>(todo.repeatMonthlyWeekOccurrence || 1);
-    const [editRepeatMonthlyWeekDay, setEditRepeatMonthlyWeekDay] = useState<number>(todo.repeatMonthlyWeekDay || 0);
+    const [editText, setEditText] = useState(task.title);
+    const [editDesc, setEditDesc] = useState(task.description || '');
+    const [editDate, setEditDate] = useState(task.date ? new Date(task.date).toISOString().split('T')[0] : '');
+    const [editTime, setEditTime] = useState(task.time || '');
+    const [editRepeat, setEditRepeat] = useState<RepeatType>(task.repeat || 'none');
+    const [editRepeatInterval, setEditRepeatInterval] = useState(task.repeatInterval || 1);
+    const [editRepeatEndDate, setEditRepeatEndDate] = useState(task.repeatEndDate ? new Date(task.repeatEndDate).toISOString().split('T')[0] : '');
+    const [editRepeatWeekDays, setEditRepeatWeekDays] = useState<number[]>(task.repeatWeekDays || []);
+    const [editRepeatMonthlyType, setEditRepeatMonthlyType] = useState<'byDate' | 'byWeekday'>(task.repeatMonthlyType || 'byDate');
+    const [editRepeatMonthlyDay, setEditRepeatMonthlyDay] = useState(task.repeatMonthlyDay || 1);
+    const [editRepeatMonthlyOccurrence, setEditRepeatMonthlyOccurrence] = useState<number | 'last'>(task.repeatMonthlyWeekOccurrence || 1);
+    const [editRepeatMonthlyWeekDay, setEditRepeatMonthlyWeekDay] = useState<number>(task.repeatMonthlyWeekDay || 0);
     const [newSubtask, setNewSubtask] = useState('');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -53,7 +53,7 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
         transition,
         isDragging,
     } = useSortable({ 
-        id: todo.id, 
+        id: task.id, 
         disabled: !isDraggable,
         animation: 150,
     });
@@ -66,20 +66,20 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
 
     const handleEditStart = (e: React.MouseEvent) => {
         e.stopPropagation();
-        setEditText(todo.title || todo.text);
-        setEditDesc(todo.description || '');
-        setEditDate(todo.dueDate ? new Date(todo.dueDate).toISOString().split('T')[0] : '');
-        setEditTime(todo.dueTime || '');
-        setEditRepeat(todo.repeat || 'none');
-        setEditRepeatInterval(todo.repeatInterval || 1);
-        setEditRepeatEndDate(todo.repeatEndDate ? new Date(todo.repeatEndDate).toISOString().split('T')[0] : '');
+        setEditText(task.title);
+        setEditDesc(task.description || '');
+        setEditDate(task.date ? new Date(task.date).toISOString().split('T')[0] : '');
+        setEditTime(task.time || '');
+        setEditRepeat(task.repeat || 'none');
+        setEditRepeatInterval(task.repeatInterval || 1);
+        setEditRepeatEndDate(task.repeatEndDate ? new Date(task.repeatEndDate).toISOString().split('T')[0] : '');
         setIsEditing(true);
         setIsExpanded(true);
     };
 
     const doToggle = () => {
-        if (onToggleOverride) onToggleOverride(todo.id);
-        else toggleTodo(todo.id);
+        if (onToggleOverride) onToggleOverride(task.id);
+        else toggleTask(task.id);
     };
 
     const doDelete = () => {
@@ -88,28 +88,28 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
 
     const confirmDelete = () => {
         if (onDeleteOverride) {
-            onDeleteOverride(todo.id);
+            onDeleteOverride(task.id);
         } else {
-            deleteTodo(todo.id);
+            deleteTask(task.id);
         }
         setShowDeleteConfirm(false);
     };
 
-    const doUpdate = (updates: Partial<Todo | SubTask>) => {
-        if (onUpdateOverride) onUpdateOverride(todo.id, updates);
-        else updateTodo(todo.id, updates as Partial<Todo>);
+    const doUpdate = (updates: Partial<Task | SubTask>) => {
+        if (onUpdateOverride) onUpdateOverride(task.id, updates);
+        else updateTask(task.id, updates as Partial<Task>);
     };
 
     const handleUpdate = () => {
         if (editText.trim()) {
-            const dueDate = editDate ? new Date(editDate).getTime() : undefined;
+            const date = editDate ? new Date(editDate).getTime() : undefined;
             const repeatEndDateMs = editRepeatEndDate ? new Date(editRepeatEndDate).getTime() : undefined;
             doUpdate({
                 title: editText.trim(),
                 text: editText.trim(),
                 description: editDesc.trim() || undefined,
-                dueDate,
-                dueTime: editTime || undefined,
+                date,
+                time: editTime || undefined,
                 repeat: editRepeat,
                 repeatInterval: editRepeat !== 'none' ? editRepeatInterval : undefined,
                 repeatEndDate: editRepeat !== 'none' ? repeatEndDateMs : undefined,
@@ -126,28 +126,28 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
 
     const toggleSubtask = (subtaskId: string) => {
         if (isSubtask) return; // Paranoia check
-        const parentTodo = todo as Todo;
-        const updatedSubtasks = parentTodo.subtasks?.map(st =>
+        const parentTask = task as Task;
+        const updatedSubtasks = parentTask.subtasks?.map(st =>
             st.id === subtaskId ? { ...st, completed: !st.completed } : st
         );
-        doUpdate({ subtasks: updatedSubtasks } as Partial<Todo>);
+        doUpdate({ subtasks: updatedSubtasks } as Partial<Task>);
     };
 
     const handleSubtaskToggle = () => {
         if (isSubtask && onToggleOverride) {
-            onToggleOverride(todo.id);
+            onToggleOverride(task.id);
         } else {
             doToggle();
         }
     };
 
-    const parentTodo = todo as Todo;
-    const subtaskProgress = parentTodo.subtasks?.length
-        ? Math.round((parentTodo.subtasks.filter(s => s.completed).length / parentTodo.subtasks.length) * 100)
+    const parentTask = task as Task;
+    const subtaskProgress = parentTask.subtasks?.length
+        ? Math.round((parentTask.subtasks.filter(s => s.completed).length / parentTask.subtasks.length) * 100)
         : 0;
 
-    const formattedDate = todo.dueDate
-        ? new Date(todo.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    const formattedDate = task.date
+        ? new Date(task.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
         : null;
 
     const todoContent = (
@@ -155,7 +155,7 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
             ref={isDraggable ? setNodeRef : undefined}
             style={isDraggable ? style : undefined}
             layout
-            layoutId={todo.id}
+            layoutId={task.id}
             initial={{ opacity: 0, scale: 0.98, y: 10 }}
             animate={{
                 opacity: isDragging ? 0 : 1,
@@ -171,7 +171,7 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
             className={cn(
                 'group flex flex-col gap-0 p-1.5 rounded-[28px] border transition-all duration-300',
                 isExpanded ? 'bg-white/60 dark:bg-slate-900/60 shadow-xl border-indigo-200/50 dark:border-indigo-900/30 backdrop-blur-xl' : 'bg-white/40 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800/60 shadow-sm hover:shadow-md hover:bg-white/80 dark:hover:bg-slate-900/80 backdrop-blur-md',
-                todo.completed && !isExpanded ? 'opacity-60 bg-slate-50/50 dark:bg-slate-900/20 grayscale-[0.2]' : 'opacity-100',
+                task.completed && !isExpanded ? 'opacity-60 bg-slate-50/50 dark:bg-slate-900/20 grayscale-[0.2]' : 'opacity-100',
                 isDragging ? 'z-40' : 'z-auto'
             )}
         >
@@ -188,7 +188,7 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                         <GripVertical className="w-4 h-4" />
                     </div>
                     <Checkbox 
-                        checked={todo.completed} 
+                        checked={task.completed} 
                         onChange={() => handleSubtaskToggle()} 
                     />
                 </div>
@@ -209,17 +209,17 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                             <span
                                 className={cn(
                                     'block text-lg font-semibold transition-all duration-300 pr-4',
-                                    todo.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'
+                                    task.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'
                                 )}
                             >
-                                {todo.title || todo.text}
+                                {task.title}
                             </span>
-                            {!isExpanded && todo.description && (
+                            {!isExpanded && task.description && (
                                 <p className="text-xs text-slate-400 dark:text-slate-500 line-clamp-1 max-w-[80%] leading-relaxed">
-                                    {todo.description}
+                                    {task.description}
                                 </p>
                             )}
-                            {!isExpanded && (formattedDate || todo.dueTime || (todo.repeat && todo.repeat !== 'none') || (!isSubtask && parentTodo.subtasks && parentTodo.subtasks.length > 0)) && (
+                            {!isExpanded && (formattedDate || task.time || (task.repeat && task.repeat !== 'none') || (!isSubtask && parentTask.subtasks && parentTask.subtasks.length > 0)) && (
                                 <div className="flex flex-wrap items-center gap-2 pt-1">
                                     {formattedDate && (
                                         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-[9px] font-bold text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/30">
@@ -227,33 +227,33 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                             {formattedDate}
                                         </div>
                                     )}
-                                    {todo.dueTime && (
+                                    {task.time && (
                                         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-[9px] font-bold text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/30">
                                             <Clock className="w-3 h-3" />
-                                            {todo.dueTime}
+                                            {task.time}
                                         </div>
                                     )}
-                                    {todo.repeat && todo.repeat !== 'none' && (
+                                    {task.repeat && task.repeat !== 'none' && (
                                         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/30">
                                             <Repeat className="w-3 h-3" />
                                             <span className="capitalize">
-                                                {todo.repeatInterval && todo.repeatInterval > 1 ? `Every ${todo.repeatInterval} ${todo.repeat === 'daily' ? 'days' : todo.repeat === 'weekly' ? 'weeks' : 'months'}` : todo.repeat}
-                                                {todo.repeat === 'weekly' && todo.repeatWeekDays && todo.repeatWeekDays.length > 0 && (
-                                                    <span className="ml-0.5">{todo.repeatWeekDays.map(d => ['S', 'M', 'T', 'W', 'T', 'F', 'S'][d]).join('')}</span>
+                                                {task.repeatInterval && task.repeatInterval > 1 ? `Every ${task.repeatInterval} ${task.repeat === 'daily' ? 'days' : task.repeat === 'weekly' ? 'weeks' : 'months'}` : task.repeat}
+                                                {task.repeat === 'weekly' && task.repeatWeekDays && task.repeatWeekDays.length > 0 && (
+                                                    <span className="ml-0.5">{task.repeatWeekDays.map(d => ['S', 'M', 'T', 'W', 'T', 'F', 'S'][d]).join('')}</span>
                                                 )}
-                                                {todo.repeat === 'monthly' && todo.repeatMonthlyType === 'byWeekday' && todo.repeatMonthlyWeekOccurrence && todo.repeatMonthlyWeekDay !== undefined && (
-                                                    <span className="ml-0.5">{['1st', '2nd', '3rd', '4th', 'Last'][todo.repeatMonthlyWeekOccurrence === 'last' ? 4 : todo.repeatMonthlyWeekOccurrence - 1]}{['S', 'M', 'T', 'W', 'T', 'F', 'S'][todo.repeatMonthlyWeekDay]}</span>
+                                                {task.repeat === 'monthly' && task.repeatMonthlyType === 'byWeekday' && task.repeatMonthlyWeekOccurrence && task.repeatMonthlyWeekDay !== undefined && (
+                                                    <span className="ml-0.5">{['1st', '2nd', '3rd', '4th', 'Last'][task.repeatMonthlyWeekOccurrence === 'last' ? 4 : task.repeatMonthlyWeekOccurrence - 1]}{['S', 'M', 'T', 'W', 'T', 'F', 'S'][task.repeatMonthlyWeekDay]}</span>
                                                 )}
-                                                {todo.repeat === 'monthly' && todo.repeatMonthlyType === 'byDate' && todo.repeatMonthlyDay && (
-                                                    <span className="ml-0.5">{todo.repeatMonthlyDay === 'last' ? 'Last' : `D${todo.repeatMonthlyDay}`}</span>
+                                                {task.repeat === 'monthly' && task.repeatMonthlyType === 'byDate' && task.repeatMonthlyDay && (
+                                                    <span className="ml-0.5">{task.repeatMonthlyDay === 'last' ? 'Last' : `D${task.repeatMonthlyDay}`}</span>
                                                 )}
                                             </span>
                                         </div>
                                     )}
-                                    {!isSubtask && parentTodo.subtasks && parentTodo.subtasks.length > 0 && (
+                                    {!isSubtask && parentTask.subtasks && parentTask.subtasks.length > 0 && (
                                         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-[9px] font-bold text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-800/30">
                                             <ListPlus className="w-3 h-3" />
-                                            {parentTodo.subtasks.filter(s => s.completed).length}/{parentTodo.subtasks.length}
+                                            {parentTask.subtasks.filter(s => s.completed).length}/{parentTask.subtasks.length}
                                         </div>
                                     )}
                                 </div>
@@ -466,10 +466,10 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                         </div>
                                     </div>
                                 ) : (
-                                    todo.description ? (
+                                    task.description ? (
                                         <div className="bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-4">
                                             <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
-                                                {todo.description}
+                                                {task.description}
                                             </p>
                                         </div>
                                     ) : (
@@ -486,34 +486,34 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                         {formattedDate}
                                     </div>
                                 )}
-                                {todo.dueTime && (
+                                {task.time && (
                                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-800/30">
                                         <Clock className="w-3.5 h-3.5" />
-                                        {todo.dueTime}
+                                        {task.time}
                                     </div>
                                 )}
-                                {todo.repeat && todo.repeat !== 'none' && (
+                                {task.repeat && task.repeat !== 'none' && (
                                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-100 dark:border-emerald-800/30">
                                         <Repeat className="w-3.5 h-3.5" />
                                         <span>
-                                            <span className="capitalize">{todo.repeatInterval && todo.repeatInterval > 1 ? `Every ${todo.repeatInterval} ${todo.repeat === 'daily' ? 'days' : todo.repeat === 'weekly' ? 'weeks' : 'months'}` : todo.repeat}</span>
-                                            {todo.repeat === 'weekly' && todo.repeatWeekDays && todo.repeatWeekDays.length > 0 && (
-                                                <span className="ml-1">on {todo.repeatWeekDays.map(d => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d]).join(', ')}</span>
+                                            <span className="capitalize">{task.repeatInterval && task.repeatInterval > 1 ? `Every ${task.repeatInterval} ${task.repeat === 'daily' ? 'days' : task.repeat === 'weekly' ? 'weeks' : 'months'}` : task.repeat}</span>
+                                            {task.repeat === 'weekly' && task.repeatWeekDays && task.repeatWeekDays.length > 0 && (
+                                                <span className="ml-1">on {task.repeatWeekDays.map(d => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d]).join(', ')}</span>
                                             )}
-                                            {todo.repeat === 'monthly' && todo.repeatMonthlyType === 'byWeekday' && todo.repeatMonthlyWeekOccurrence && todo.repeatMonthlyWeekDay !== undefined && (
-                                                <span className="ml-1">on {['First', 'Second', 'Third', 'Fourth', 'Last'][todo.repeatMonthlyWeekOccurrence === 'last' ? 4 : todo.repeatMonthlyWeekOccurrence - 1]} {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][todo.repeatMonthlyWeekDay]}</span>
+                                            {task.repeat === 'monthly' && task.repeatMonthlyType === 'byWeekday' && task.repeatMonthlyWeekOccurrence && task.repeatMonthlyWeekDay !== undefined && (
+                                                <span className="ml-1">on {['First', 'Second', 'Third', 'Fourth', 'Last'][task.repeatMonthlyWeekOccurrence === 'last' ? 4 : task.repeatMonthlyWeekOccurrence - 1]} {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][task.repeatMonthlyWeekDay]}</span>
                                             )}
-                                            {todo.repeat === 'monthly' && todo.repeatMonthlyType === 'byDate' && todo.repeatMonthlyDay && (
-                                                <span className="ml-1">on {todo.repeatMonthlyDay === 'last' ? 'Last day' : `Day ${todo.repeatMonthlyDay}`}</span>
+                                            {task.repeat === 'monthly' && task.repeatMonthlyType === 'byDate' && task.repeatMonthlyDay && (
+                                                <span className="ml-1">on {task.repeatMonthlyDay === 'last' ? 'Last day' : `Day ${task.repeatMonthlyDay}`}</span>
                                             )}
-                                            {todo.repeatEndDate && ` until ${new Date(todo.repeatEndDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`}
+                                            {task.repeatEndDate && ` until ${new Date(task.repeatEndDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`}
                                         </span>
                                     </div>
                                 )}
-                                {!isSubtask && parentTodo.subtasks && parentTodo.subtasks.length > 0 && (
+                                {!isSubtask && parentTask.subtasks && parentTask.subtasks.length > 0 && (
                                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-[10px] font-bold text-amber-600 dark:text-amber-400 shadow-sm border border-amber-100 dark:border-amber-800/30">
                                         <ListPlus className="w-3.5 h-3.5" />
-                                        {parentTodo.subtasks.filter(s => s.completed).length}/{parentTodo.subtasks.length}
+                                        {parentTask.subtasks.filter(s => s.completed).length}/{parentTask.subtasks.length}
                                     </div>
                                 )}
                             </div>
@@ -530,7 +530,7 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                                                {(parentTodo.subtasks || []).filter(s => s.completed).length} of {(parentTodo.subtasks || []).length}
+                                                {(parentTask.subtasks || []).filter(s => s.completed).length} of {(parentTask.subtasks || []).length}
                                             </span>
                                             <span className="text-xs font-black text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-full">{subtaskProgress}%</span>
                                         </div>
@@ -550,21 +550,21 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
 
                                     {/* Interactive Subtask List */}
                                     <div className="grid grid-cols-1 gap-2 pt-2">
-                                        {(parentTodo.subtasks || []).map((st) => (
-                                            <TodoItem
+                                        {(parentTask.subtasks || []).map((st) => (
+                                            <TaskItem
                                                 key={st.id}
-                                                todo={st as Todo}
+                                                task={st as Task}
                                                 isSubtask={true}
                                                 onToggleOverride={() => toggleSubtask(st.id)}
                                                 onUpdateOverride={(id, updates) => {
-                                                    const updatedSubtasks = parentTodo.subtasks?.map(sub =>
+                                                    const updatedSubtasks = parentTask.subtasks?.map(sub =>
                                                         sub.id === id ? { ...sub, ...updates } : sub
                                                     );
-                                                    doUpdate({ subtasks: updatedSubtasks } as Partial<Todo>);
+                                                    doUpdate({ subtasks: updatedSubtasks } as Partial<Task>);
                                                 }}
                                                 onDeleteOverride={(id) => {
-                                                    const updatedSubtasks = parentTodo.subtasks?.filter(sub => sub.id !== id);
-                                                    doUpdate({ subtasks: updatedSubtasks } as Partial<Todo>);
+                                                    const updatedSubtasks = parentTask.subtasks?.filter(sub => sub.id !== id);
+                                                    doUpdate({ subtasks: updatedSubtasks } as Partial<Task>);
                                                 }}
                                             />
                                         ))}
@@ -582,10 +582,10 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                                     if (e.key === 'Enter' && e.currentTarget.value.trim()) {
                                                         e.preventDefault();
                                                         const newSubtaskText = e.currentTarget.value.trim();
-                                                        const currentSubtasks = parentTodo.subtasks || [];
+                                                        const currentSubtasks = parentTask.subtasks || [];
                                                         doUpdate({
                                                             subtasks: [...currentSubtasks, { id: crypto.randomUUID(), text: newSubtaskText, title: newSubtaskText, completed: false }]
-                                                        } as Partial<Todo>);
+                                                        } as Partial<Task>);
                                                         setNewSubtask('');
                                                     }
                                                 }}
@@ -597,10 +597,10 @@ export const TodoItem = ({ todo, isSubtask, onToggleOverride, onUpdateOverride, 
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     if (newSubtask.trim()) {
-                                                        const currentSubtasks = parentTodo.subtasks || [];
+                                                        const currentSubtasks = parentTask.subtasks || [];
                                                         doUpdate({
                                                             subtasks: [...currentSubtasks, { id: crypto.randomUUID(), text: newSubtask.trim(), title: newSubtask.trim(), completed: false }]
-                                                        } as Partial<Todo>);
+                                                        } as Partial<Task>);
                                                         setNewSubtask('');
                                                     }
                                                 }}

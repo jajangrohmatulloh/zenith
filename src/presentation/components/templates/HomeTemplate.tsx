@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { TodoForm } from '../organisms/TodoForm';
-import { TodoList } from '../organisms/TodoList';
+import { TaskForm } from '../organisms/TaskForm';
+import { TaskList } from '../organisms/TaskList';
 import { Mountain } from 'lucide-react';
 import { ThemeToggle } from '../atoms/ThemeToggle';
 import { CalendarView } from '../organisms/CalendarView';
@@ -28,15 +28,11 @@ export const HomeTemplate = ({ onLoginToggle }: HomeTemplateProps) => {
                 <div className="fixed top-6 right-6 z-50 flex items-center gap-3">
                     {user ? (
                         <>
-                            <button
-                                onClick={() => setShowProfile(!showProfile)}
-                                className="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/40 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/80 shadow-sm hover:scale-105 transition-all text-slate-600 dark:text-slate-200 cursor-pointer"
-                            >
-                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                            <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/40 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/80 shadow-sm text-slate-600 dark:text-slate-200">
                                 <span className="text-xs font-bold">
                                     {user.user_metadata?.full_name || user.email?.split('@')[0]}
                                 </span>
-                            </button>
+                            </div>
                             <ThemeToggle />
                             <button
                                 onClick={() => setShowProfile(!showProfile)}
@@ -107,10 +103,10 @@ export const HomeTemplate = ({ onLoginToggle }: HomeTemplateProps) => {
 
                             <div className="lg:col-span-8 bg-white/60 dark:bg-slate-900/90 backdrop-blur-2xl border border-white/20 dark:border-slate-800/50 rounded-[32px] p-6 md:p-10 shadow-2xl shadow-indigo-500/10 dark:shadow-black/40">
                                 <div className="mb-10">
-                                    <TodoForm />
+                                    <TaskForm />
                                 </div>
 
-                                <TodoList />
+                                <TaskList />
                             </div>
                         </>
                     )}
