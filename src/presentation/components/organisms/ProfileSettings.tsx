@@ -6,7 +6,7 @@ import { supabase } from '@/infrastructure/supabase';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, AlertCircle, ArrowLeft, Mountain } from 'lucide-react';
+import { User, Mail, Lock, AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Mountain } from 'lucide-react';
 
 interface ProfileSettingsProps {
     onBack: () => void;
@@ -22,10 +22,10 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
     // Check if form has changes
-    const hasChanges = firstName !== user?.user_metadata?.first_name || 
-                       lastName !== user?.user_metadata?.last_name || 
-                       email !== user?.email || 
-                       password.trim() !== '';
+    const hasChanges = firstName !== user?.user_metadata?.first_name ||
+        lastName !== user?.user_metadata?.last_name ||
+        email !== user?.email ||
+        password.trim() !== '';
 
     useEffect(() => {
         if (user) {
@@ -106,11 +106,13 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                     <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">First Name</label>
                         <div className="relative">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-100" strokeWidth={2.5} />
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center z-10 backdrop-blur-none">
+                                <User className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+                            </div>
                             <Input
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
-                                className="pl-12 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
+                                className="pl-11 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark] rounded-2xl h-12"
                                 placeholder="John"
                             />
                         </div>
@@ -118,11 +120,13 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                     <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Last Name</label>
                         <div className="relative">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-100" strokeWidth={2.5} />
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center z-10 backdrop-blur-none">
+                                <User className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+                            </div>
                             <Input
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
-                                className="pl-12 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
+                                className="pl-11 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark] rounded-2xl h-12"
                                 placeholder="Doe"
                             />
                         </div>
@@ -132,12 +136,14 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                 <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
                     <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-100" strokeWidth={2.5} />
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center z-10 backdrop-blur-none">
+                            <Mail className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+                        </div>
                         <Input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="pl-12 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
+                            className="pl-11 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark] rounded-2xl h-12"
                             placeholder="name@example.com"
                         />
                     </div>
@@ -147,12 +153,14 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                 <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">New Password (Optional)</label>
                     <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-100" strokeWidth={2.5} />
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-lg bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center z-10 backdrop-blur-none">
+                            <Lock className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+                        </div>
                         <Input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="pl-12 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
+                            className="pl-11 bg-white/80 dark:bg-slate-900/60 border-slate-300/60 dark:border-slate-700/60 text-slate-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark] rounded-2xl h-12"
                             placeholder="••••••••"
                         />
                     </div>
@@ -164,8 +172,8 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className={`p-4 rounded-2xl flex items-center gap-3 border ${message.type === 'success'
-                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                                : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
+                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                            : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
                             }`}
                     >
                         {message.type === 'success' ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : <AlertCircle className="w-5 h-5 flex-shrink-0" />}
@@ -185,9 +193,10 @@ export const ProfileSettings = ({ onBack }: ProfileSettingsProps) => {
                                 Saving...
                             </>
                         ) : (
-                            <>
+                            <div className="flex items-center justify-center gap-2">
                                 {message?.type === 'success' ? 'Saved!' : 'Save Profile Changes'}
-                            </>
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </div>
                         )}
                     </Button>
                     <Button

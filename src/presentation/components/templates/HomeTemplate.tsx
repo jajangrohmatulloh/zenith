@@ -102,7 +102,7 @@ export const HomeTemplate = ({ onLoginToggle }: HomeTemplateProps) => {
                             </div>
 
                             <div className="lg:col-span-8 bg-white/60 dark:bg-slate-900/90 backdrop-blur-2xl border border-white/20 dark:border-slate-800/50 rounded-[32px] p-6 md:p-10 shadow-2xl shadow-indigo-500/10 dark:shadow-black/40">
-                                <div className="mb-10">
+                                <div className="mb-10 relative z-30">
                                     <TaskForm />
                                 </div>
 

@@ -15,7 +15,7 @@ export const DayOfMonthDropdown = ({ value, onChange }: DayOfMonthDropdownProps)
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Generate days 1-31 plus "Last day" option
-    const days = [
+    const days: { value: number | 'last'; label: string }[] = [
         ...Array.from({ length: 31 }, (_, i) => ({ value: i + 1, label: `Day ${i + 1}` })),
         { value: 'last', label: 'Last day' },
     ];
@@ -52,7 +52,7 @@ export const DayOfMonthDropdown = ({ value, onChange }: DayOfMonthDropdownProps)
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute left-0 top-full mt-2 w-full bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 z-[9999] overflow-hidden"
+                        className="absolute left-0 top-full mt-2 w-full bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 z-9999 overflow-hidden"
                         style={{
                             scrollbarWidth: 'thin',
                             scrollbarColor: 'rgb(148, 163, 184) transparent'
@@ -70,8 +70,8 @@ export const DayOfMonthDropdown = ({ value, onChange }: DayOfMonthDropdownProps)
                                     className={cn(
                                         "w-full text-left px-3 py-1.5 text-xs font-medium transition-colors flex items-center justify-between",
                                         value === day.value
-                                            ? "bg-indigo-600 text-white"
-                                            : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                            ? "bg-indigo-600 text-white cursor-pointer"
+                                            : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                                     )}
                                 >
                                     {day.label}

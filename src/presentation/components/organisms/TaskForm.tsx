@@ -148,7 +148,7 @@ export const TaskForm = () => {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden space-y-4"
+                        className="space-y-4"
                     >
                         {/* Error Message */}
                         {error && (
@@ -160,7 +160,7 @@ export const TaskForm = () => {
                                 {error}
                             </motion.div>
                         )}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-visible">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Description</label>
                                 <textarea

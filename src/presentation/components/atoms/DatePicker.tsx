@@ -16,13 +16,8 @@ interface DatePickerProps {
 
 export const DatePicker = ({ value, onChange, className, minDate }: DatePickerProps) => {
     const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
     const [viewDate, setViewDate] = useState(value ? new Date(value) : new Date());
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -41,9 +36,11 @@ export const DatePicker = ({ value, onChange, className, minDate }: DatePickerPr
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, [isOpen]);
 
     const prevMonth = () => {
         setViewDate(new Date(year, month - 1, 1));
@@ -63,16 +60,16 @@ export const DatePicker = ({ value, onChange, className, minDate }: DatePickerPr
     const isSelected = (day: number) => {
         if (!value) return false;
         const selectedDate = new Date(value);
-        return selectedDate.getFullYear() === year && 
-               selectedDate.getMonth() === month && 
-               selectedDate.getDate() === day;
+        return selectedDate.getFullYear() === year &&
+            selectedDate.getMonth() === month &&
+            selectedDate.getDate() === day;
     };
 
     const isToday = (day: number) => {
         const today = new Date();
-        return today.getFullYear() === year && 
-               today.getMonth() === month && 
-               today.getDate() === day;
+        return today.getFullYear() === year &&
+            today.getMonth() === month &&
+            today.getDate() === day;
     };
 
     const isDisabled = (day: number) => {
@@ -99,10 +96,10 @@ export const DatePicker = ({ value, onChange, className, minDate }: DatePickerPr
                 className={cn(
                     "w-8 h-8 rounded-lg text-xs font-medium transition-all",
                     isSelected(day)
-                        ? "bg-indigo-600 text-white"
+                        ? "bg-indigo-600 text-white cursor-pointer"
                         : isToday(day)
-                            ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400"
-                            : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800",
+                            ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 cursor-pointer"
+                            : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer",
                     isDisabled(day) && "opacity-30 cursor-not-allowed"
                 )}
             >
@@ -118,7 +115,7 @@ export const DatePicker = ({ value, onChange, className, minDate }: DatePickerPr
     };
 
     return (
-        <div className="relative flex items-center" ref={dropdownRef}>
+        <div ref={dropdownRef} className="relative w-full">
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
@@ -129,25 +126,29 @@ export const DatePicker = ({ value, onChange, className, minDate }: DatePickerPr
                     className
                 )}
             >
-                {value ? (
-                    <span className="flex-1 text-left">{formatDate(value)}</span>
-                ) : (
-                    formatDate(value)
-                )}
-                <ChevronDown className={cn("w-4 h-4 transition-transform", isOpen ? "rotate-180" : "")} />
+                <div className="flex-1 flex items-center">
+                    {value ? (
+                        <span className="flex-1 text-left">{formatDate(value)}</span>
+                    ) : (
+                        formatDate(value)
+                    )}
+                </div>
+                <div className="flex items-center gap-1">
+                    {value && (
+                        <div
+                            role="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onChange('');
+                            }}
+                            className="p-1 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                        >
+                            <X className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+                        </div>
+                    )}
+                    <ChevronDown className={cn("w-4 h-4 transition-transform", isOpen ? "rotate-180" : "")} />
+                </div>
             </button>
-            {value && (
-                <button
-                    type="button"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onChange('');
-                    }}
-                    className="absolute right-10 p-1 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition-colors z-10"
-                >
-                    <X className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                </button>
-            )}
 
             <AnimatePresence>
                 {isOpen && (
@@ -156,7 +157,7 @@ export const DatePicker = ({ value, onChange, className, minDate }: DatePickerPr
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute left-0 top-full mt-2 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden"
+                        className="absolute left-0 top-full mt-2 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 z-[99999] overflow-hidden"
                     >
                         {/* Header with Month/Year Selectors */}
                         <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20">
@@ -165,7 +166,7 @@ export const DatePicker = ({ value, onChange, className, minDate }: DatePickerPr
                                 onClick={prevMonth}
                                 className="p-2 rounded-xl hover:bg-white/50 dark:hover:bg-slate-700/50 transition-all hover:scale-110"
                             >
-                                <ChevronLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                                <ChevronLeft className="w-4 h-4 text-slate-600 dark:text-slate-300 cursor-pointer" />
                             </button>
                             <div className="flex items-center gap-2">
                                 <MonthDropdown
@@ -182,7 +183,7 @@ export const DatePicker = ({ value, onChange, className, minDate }: DatePickerPr
                                 onClick={nextMonth}
                                 className="p-2 rounded-xl hover:bg-white/50 dark:hover:bg-slate-700/50 transition-all hover:scale-110"
                             >
-                                <ChevronRight className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                                <ChevronRight className="w-4 h-4 text-slate-600 dark:text-slate-300 cursor-pointer" />
                             </button>
                         </div>
 
@@ -210,7 +211,7 @@ export const DatePicker = ({ value, onChange, className, minDate }: DatePickerPr
                                     onChange(formatted);
                                     setIsOpen(false);
                                 }}
-                                className="w-full py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
+                                className="w-full py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors cursor-pointer"
                             >
                                 Go to Today
                             </button>
