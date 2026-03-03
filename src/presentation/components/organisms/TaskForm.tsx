@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Clock, Repeat, ListPlus, ChevronDown, ChevronUp, X, Calendar } from 'lucide-react';
+import { Task, SubTask, RepeatType, WeekDay, MonthlyDay, WeekOccurrence, MonthlyRepeatType } from '../../../core/domain/task.entity';
 import { useTask } from '../../context/task-context';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
@@ -19,14 +20,14 @@ export const TaskForm = () => {
     const [description, setDescription] = useState('');
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
-    const [repeat, setRepeat] = useState<'none' | 'daily' | 'weekly' | 'monthly' | 'yearly'>('none');
+    const [repeat, setRepeat] = useState<RepeatType>('none');
     const [repeatInterval, setRepeatInterval] = useState(1);
     const [repeatEndDate, setRepeatEndDate] = useState('');
-    const [repeatWeekDays, setRepeatWeekDays] = useState<number[]>([]);
-    const [repeatMonthlyType, setRepeatMonthlyType] = useState<'byDate' | 'byWeekday'>('byDate');
-    const [repeatMonthlyDay, setRepeatMonthlyDay] = useState(1);
-    const [repeatMonthlyOccurrence, setRepeatMonthlyOccurrence] = useState<number | 'last'>(1);
-    const [repeatMonthlyWeekDay, setRepeatMonthlyWeekDay] = useState(0);
+    const [repeatWeekDays, setRepeatWeekDays] = useState<WeekDay[]>([]);
+    const [repeatMonthlyType, setRepeatMonthlyType] = useState<MonthlyRepeatType>('byDate');
+    const [repeatMonthlyDay, setRepeatMonthlyDay] = useState<MonthlyDay>(1);
+    const [repeatMonthlyOccurrence, setRepeatMonthlyOccurrence] = useState<WeekOccurrence>(1);
+    const [repeatMonthlyWeekDay, setRepeatMonthlyWeekDay] = useState<WeekDay>(0);
     const [subtasks, setSubtasks] = useState<{ id: string; text: string; title: string; completed: boolean; createdAt: number }[]>([]);
     const [newSubtask, setNewSubtask] = useState('');
     const [isExpanded, setIsExpanded] = useState(false);
@@ -314,9 +315,9 @@ export const TaskForm = () => {
                                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSubtask())}
                                     className="text-xs h-10 rounded-xl"
                                 />
-                                <Button 
-                                    type="button" 
-                                    size="sm" 
+                                <Button
+                                    type="button"
+                                    size="sm"
                                     onClick={addSubtask}
                                     disabled={!newSubtask.trim()}
                                     className="rounded-xl px-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"

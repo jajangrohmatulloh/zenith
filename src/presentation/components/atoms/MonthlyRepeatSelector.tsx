@@ -6,15 +6,17 @@ import { OccurrenceDropdown } from './OccurrenceDropdown';
 import { WeekdayDropdown } from './WeekdayDropdown';
 import { DayOfMonthDropdown } from './DayOfMonthDropdown';
 
+import { MonthlyRepeatType, MonthlyDay, WeekOccurrence, WeekDay } from '../../../core/domain/task.entity';
+
 interface MonthlyRepeatSelectorProps {
-    monthlyType: 'byDate' | 'byWeekday';
-    onTypeChange: (type: 'byDate' | 'byWeekday') => void;
-    dayOfMonth: number | 'last';
-    onDayOfMonthChange: (day: number | 'last') => void;
-    weekOccurrence: number | 'last';
-    onWeekOccurrenceChange: (occurrence: number | 'last') => void;
-    weekDay: number;
-    onWeekDayChange: (day: number) => void;
+    monthlyType: MonthlyRepeatType;
+    onTypeChange: (type: MonthlyRepeatType) => void;
+    dayOfMonth: MonthlyDay;
+    onDayOfMonthChange: (day: MonthlyDay) => void;
+    weekOccurrence: WeekOccurrence;
+    onWeekOccurrenceChange: (occurrence: WeekOccurrence) => void;
+    weekDay: WeekDay;
+    onWeekDayChange: (day: WeekDay) => void;
 }
 
 export const MonthlyRepeatSelector = ({

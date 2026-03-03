@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Edit2, Check, X, Clock, Repeat, ListPlus, ChevronDown, ChevronUp, Calendar, GripVertical, Plus } from 'lucide-react';
-import { Task, SubTask, RepeatType } from '../../../core/domain/task.entity';
+import { Task, SubTask, RepeatType, WeekDay, MonthlyDay, WeekOccurrence, MonthlyRepeatType } from '../../../core/domain/task.entity';
 import { useTask } from '../../context/task-context';
 import { Checkbox } from '../atoms/Checkbox';
 import { Button } from '../atoms/Button';
@@ -28,20 +28,24 @@ interface TaskItemProps {
 
 export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, onDeleteOverride, isDraggable = false }: TaskItemProps) => {
     const { toggleTask, deleteTask, updateTask } = useTask();
+    const taskAsTask = task as Task;
+    const taskAsSubtask = task as SubTask;
+    const displayTitle = 'title' in task ? (task.title || '') : (taskAsSubtask.text || '');
+
     const [isEditing, setIsEditing] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
-    const [editText, setEditText] = useState(task.title);
+    const [editText, setEditText] = useState(displayTitle);
     const [editDesc, setEditDesc] = useState(task.description || '');
     const [editDate, setEditDate] = useState(task.date ? new Date(task.date).toISOString().split('T')[0] : '');
     const [editTime, setEditTime] = useState(task.time || '');
     const [editRepeat, setEditRepeat] = useState<RepeatType>(task.repeat || 'none');
     const [editRepeatInterval, setEditRepeatInterval] = useState(task.repeatInterval || 1);
     const [editRepeatEndDate, setEditRepeatEndDate] = useState(task.repeatEndDate ? new Date(task.repeatEndDate).toISOString().split('T')[0] : '');
-    const [editRepeatWeekDays, setEditRepeatWeekDays] = useState<number[]>(task.repeatWeekDays || []);
-    const [editRepeatMonthlyType, setEditRepeatMonthlyType] = useState<'byDate' | 'byWeekday'>(task.repeatMonthlyType || 'byDate');
-    const [editRepeatMonthlyDay, setEditRepeatMonthlyDay] = useState(task.repeatMonthlyDay || 1);
-    const [editRepeatMonthlyOccurrence, setEditRepeatMonthlyOccurrence] = useState<number | 'last'>(task.repeatMonthlyWeekOccurrence || 1);
-    const [editRepeatMonthlyWeekDay, setEditRepeatMonthlyWeekDay] = useState<number>(task.repeatMonthlyWeekDay || 0);
+    const [editRepeatWeekDays, setEditRepeatWeekDays] = useState<WeekDay[]>(taskAsTask.repeatWeekDays || []);
+    const [editRepeatMonthlyType, setEditRepeatMonthlyType] = useState<MonthlyRepeatType>(taskAsTask.repeatMonthlyType || 'byDate');
+    const [editRepeatMonthlyDay, setEditRepeatMonthlyDay] = useState<MonthlyDay>(taskAsTask.repeatMonthlyDay || 1);
+    const [editRepeatMonthlyOccurrence, setEditRepeatMonthlyOccurrence] = useState<WeekOccurrence>(taskAsTask.repeatMonthlyWeekOccurrence || 1);
+    const [editRepeatMonthlyWeekDay, setEditRepeatMonthlyWeekDay] = useState<WeekDay>(taskAsTask.repeatMonthlyWeekDay || 0);
     const [newSubtask, setNewSubtask] = useState('');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -52,10 +56,9 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
         transform,
         transition,
         isDragging,
-    } = useSortable({ 
-        id: task.id, 
+    } = useSortable({
+        id: task.id,
         disabled: !isDraggable,
-        animation: 150,
     });
 
     const style = {
@@ -66,7 +69,7 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
 
     const handleEditStart = (e: React.MouseEvent) => {
         e.stopPropagation();
-        setEditText(task.title);
+        setEditText(displayTitle);
         setEditDesc(task.description || '');
         setEditDate(task.date ? new Date(task.date).toISOString().split('T')[0] : '');
         setEditTime(task.time || '');
@@ -105,19 +108,19 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
             const date = editDate ? new Date(editDate).getTime() : undefined;
             const repeatEndDateMs = editRepeatEndDate ? new Date(editRepeatEndDate).getTime() : undefined;
             doUpdate({
-                title: editText.trim(),
-                text: editText.trim(),
+                title: 'title' in task ? editText.trim() : undefined,
+                text: 'text' in task ? editText.trim() : undefined,
                 description: editDesc.trim() || undefined,
                 date,
                 time: editTime || undefined,
                 repeat: editRepeat,
                 repeatInterval: editRepeat !== 'none' ? editRepeatInterval : undefined,
                 repeatEndDate: editRepeat !== 'none' ? repeatEndDateMs : undefined,
-                repeatWeekDays: editRepeat === 'weekly' && editRepeatWeekDays.length > 0 ? editRepeatWeekDays : undefined,
+                repeatWeekDays: editRepeat === 'weekly' && editRepeatWeekDays.length > 0 ? editRepeatWeekDays as WeekDay[] : undefined,
                 repeatMonthlyType: editRepeat === 'monthly' ? editRepeatMonthlyType : undefined,
-                repeatMonthlyDay: editRepeat === 'monthly' && editRepeatMonthlyType === 'byDate' ? editRepeatMonthlyDay : undefined,
-                repeatMonthlyWeekOccurrence: editRepeat === 'monthly' && editRepeatMonthlyType === 'byWeekday' ? editRepeatMonthlyOccurrence : undefined,
-                repeatMonthlyWeekDay: editRepeat === 'monthly' && editRepeatMonthlyType === 'byWeekday' ? editRepeatMonthlyWeekDay : undefined,
+                repeatMonthlyDay: editRepeat === 'monthly' && editRepeatMonthlyType === 'byDate' ? editRepeatMonthlyDay as MonthlyDay : undefined,
+                repeatMonthlyWeekOccurrence: editRepeat === 'monthly' && editRepeatMonthlyType === 'byWeekday' ? editRepeatMonthlyOccurrence as WeekOccurrence : undefined,
+                repeatMonthlyWeekDay: editRepeat === 'monthly' && editRepeatMonthlyType === 'byWeekday' ? editRepeatMonthlyWeekDay as WeekDay : undefined,
                 repeatYearlyType: editRepeat === 'yearly' ? 'byDate' : undefined,
             });
             setIsEditing(false);
@@ -187,9 +190,9 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
                     >
                         <GripVertical className="w-4 h-4" />
                     </div>
-                    <Checkbox 
-                        checked={task.completed} 
-                        onChange={() => handleSubtaskToggle()} 
+                    <Checkbox
+                        checked={task.completed}
+                        onChange={() => handleSubtaskToggle()}
                     />
                 </div>
 
@@ -212,7 +215,7 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
                                     task.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'
                                 )}
                             >
-                                {task.title}
+                                {displayTitle}
                             </span>
                             {!isExpanded && task.description && (
                                 <p className="text-xs text-slate-400 dark:text-slate-500 line-clamp-1 max-w-[80%] leading-relaxed">
@@ -234,18 +237,18 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
                                         </div>
                                     )}
                                     {task.repeat && task.repeat !== 'none' && (
-                                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/30">
+                                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-indigo-800/30">
                                             <Repeat className="w-3 h-3" />
                                             <span className="capitalize">
                                                 {task.repeatInterval && task.repeatInterval > 1 ? `Every ${task.repeatInterval} ${task.repeat === 'daily' ? 'days' : task.repeat === 'weekly' ? 'weeks' : 'months'}` : task.repeat}
-                                                {task.repeat === 'weekly' && task.repeatWeekDays && task.repeatWeekDays.length > 0 && (
-                                                    <span className="ml-0.5">{task.repeatWeekDays.map(d => ['S', 'M', 'T', 'W', 'T', 'F', 'S'][d]).join('')}</span>
+                                                {task.repeat === 'weekly' && taskAsTask.repeatWeekDays && taskAsTask.repeatWeekDays.length > 0 && (
+                                                    <span className="ml-0.5">{taskAsTask.repeatWeekDays.map(d => ['S', 'M', 'T', 'W', 'T', 'F', 'S'][d as number]).join('')}</span>
                                                 )}
-                                                {task.repeat === 'monthly' && task.repeatMonthlyType === 'byWeekday' && task.repeatMonthlyWeekOccurrence && task.repeatMonthlyWeekDay !== undefined && (
-                                                    <span className="ml-0.5">{['1st', '2nd', '3rd', '4th', 'Last'][task.repeatMonthlyWeekOccurrence === 'last' ? 4 : task.repeatMonthlyWeekOccurrence - 1]}{['S', 'M', 'T', 'W', 'T', 'F', 'S'][task.repeatMonthlyWeekDay]}</span>
+                                                {task.repeat === 'monthly' && taskAsTask.repeatMonthlyType === 'byWeekday' && taskAsTask.repeatMonthlyWeekOccurrence && taskAsTask.repeatMonthlyWeekDay !== undefined && (
+                                                    <span className="ml-0.5">{['1st', '2nd', '3rd', '4th', 'Last'][taskAsTask.repeatMonthlyWeekOccurrence === 'last' ? 4 : (taskAsTask.repeatMonthlyWeekOccurrence as number) - 1]}{['S', 'M', 'T', 'W', 'T', 'F', 'S'][taskAsTask.repeatMonthlyWeekDay as number]}</span>
                                                 )}
-                                                {task.repeat === 'monthly' && task.repeatMonthlyType === 'byDate' && task.repeatMonthlyDay && (
-                                                    <span className="ml-0.5">{task.repeatMonthlyDay === 'last' ? 'Last' : `D${task.repeatMonthlyDay}`}</span>
+                                                {task.repeat === 'monthly' && taskAsTask.repeatMonthlyType === 'byDate' && taskAsTask.repeatMonthlyDay && (
+                                                    <span className="ml-0.5">{taskAsTask.repeatMonthlyDay === 'last' ? 'Last' : `D${taskAsTask.repeatMonthlyDay}`}</span>
                                                 )}
                                             </span>
                                         </div>
@@ -496,14 +499,14 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
                                         <Repeat className="w-3.5 h-3.5" />
                                         <span>
                                             <span className="capitalize">{task.repeatInterval && task.repeatInterval > 1 ? `Every ${task.repeatInterval} ${task.repeat === 'daily' ? 'days' : task.repeat === 'weekly' ? 'weeks' : 'months'}` : task.repeat}</span>
-                                            {task.repeat === 'weekly' && task.repeatWeekDays && task.repeatWeekDays.length > 0 && (
-                                                <span className="ml-1">on {task.repeatWeekDays.map(d => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d]).join(', ')}</span>
+                                            {task.repeat === 'weekly' && taskAsTask.repeatWeekDays && taskAsTask.repeatWeekDays.length > 0 && (
+                                                <span className="ml-1">on {taskAsTask.repeatWeekDays.map(d => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d as number]).join(', ')}</span>
                                             )}
-                                            {task.repeat === 'monthly' && task.repeatMonthlyType === 'byWeekday' && task.repeatMonthlyWeekOccurrence && task.repeatMonthlyWeekDay !== undefined && (
-                                                <span className="ml-1">on {['First', 'Second', 'Third', 'Fourth', 'Last'][task.repeatMonthlyWeekOccurrence === 'last' ? 4 : task.repeatMonthlyWeekOccurrence - 1]} {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][task.repeatMonthlyWeekDay]}</span>
+                                            {task.repeat === 'monthly' && taskAsTask.repeatMonthlyType === 'byWeekday' && taskAsTask.repeatMonthlyWeekOccurrence && taskAsTask.repeatMonthlyWeekDay !== undefined && (
+                                                <span className="ml-1">on {['First', 'Second', 'Third', 'Fourth', 'Last'][taskAsTask.repeatMonthlyWeekOccurrence === 'last' ? 4 : (taskAsTask.repeatMonthlyWeekOccurrence as number) - 1]} {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][taskAsTask.repeatMonthlyWeekDay as number]}</span>
                                             )}
-                                            {task.repeat === 'monthly' && task.repeatMonthlyType === 'byDate' && task.repeatMonthlyDay && (
-                                                <span className="ml-1">on {task.repeatMonthlyDay === 'last' ? 'Last day' : `Day ${task.repeatMonthlyDay}`}</span>
+                                            {task.repeat === 'monthly' && taskAsTask.repeatMonthlyType === 'byDate' && taskAsTask.repeatMonthlyDay && (
+                                                <span className="ml-1">on {taskAsTask.repeatMonthlyDay === 'last' ? 'Last day' : `Day ${taskAsTask.repeatMonthlyDay}`}</span>
                                             )}
                                             {task.repeatEndDate && ` until ${new Date(task.repeatEndDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`}
                                         </span>

@@ -5,12 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Check } from 'lucide-react';
 import { cn } from './Button';
 
+import { WeekOccurrence } from '../../../core/domain/task.entity';
+
 interface OccurrenceDropdownProps {
-    value: number | 'last';
-    onChange: (value: number | 'last') => void;
+    value: WeekOccurrence;
+    onChange: (value: WeekOccurrence) => void;
 }
 
-const occurrences: { value: number | 'last'; label: string }[] = [
+const occurrences: { value: WeekOccurrence; label: string }[] = [
     { value: 1, label: 'First' },
     { value: 2, label: 'Second' },
     { value: 3, label: 'Third' },

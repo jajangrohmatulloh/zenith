@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
-import { DndContext, DragEndEvent, DragOverlay, useSensor, useSensors, PointerSensor, MeasuringStrategy, DefaultDropAnimation, Modifier, DragStartEvent, DragMoveEvent, DragCancelEvent, rectIntersection } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, DragOverlay, useSensor, useSensors, PointerSensor, MeasuringStrategy, DropAnimation, Modifier, DragStartEvent, DragMoveEvent, DragCancelEvent, rectIntersection } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { useTask } from '../../context/task-context';
 
@@ -39,7 +39,7 @@ export const TaskList = () => {
     );
 
     // Custom drop animation
-    const dropAnimation: DefaultDropAnimation = {
+    const dropAnimation: DropAnimation = {
         duration: 200,
         easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
     };

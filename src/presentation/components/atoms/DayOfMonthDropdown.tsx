@@ -5,9 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Check } from 'lucide-react';
 import { cn } from './Button';
 
+import { MonthlyDay } from '../../../core/domain/task.entity';
+
 interface DayOfMonthDropdownProps {
-    value: number | 'last';
-    onChange: (value: number | 'last') => void;
+    value: MonthlyDay;
+    onChange: (value: MonthlyDay) => void;
 }
 
 export const DayOfMonthDropdown = ({ value, onChange }: DayOfMonthDropdownProps) => {
@@ -15,8 +17,8 @@ export const DayOfMonthDropdown = ({ value, onChange }: DayOfMonthDropdownProps)
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Generate days 1-31 plus "Last day" option
-    const days: { value: number | 'last'; label: string }[] = [
-        ...Array.from({ length: 31 }, (_, i) => ({ value: i + 1, label: `Day ${i + 1}` })),
+    const days: { value: MonthlyDay; label: string }[] = [
+        ...Array.from({ length: 31 }, (_, i) => ({ value: (i + 1) as MonthlyDay, label: `Day ${i + 1}` })),
         { value: 'last', label: 'Last day' },
     ];
 

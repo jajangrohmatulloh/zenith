@@ -1,29 +1,29 @@
 'use client';
 
-import React from 'react';
+import { WeekDay } from '../../../core/domain/task.entity';
 import { cn } from './Button';
 
 interface WeekDaySelectorProps {
-    value: number[];
-    onChange: (days: number[]) => void;
+    value: WeekDay[];
+    onChange: (days: WeekDay[]) => void;
 }
 
-const weekDays = [
-    { value: 0, label: 'S', full: 'Sunday' },
-    { value: 1, label: 'M', full: 'Monday' },
-    { value: 2, label: 'T', full: 'Tuesday' },
-    { value: 3, label: 'W', full: 'Wednesday' },
-    { value: 4, label: 'T', full: 'Thursday' },
-    { value: 5, label: 'F', full: 'Friday' },
-    { value: 6, label: 'S', full: 'Saturday' },
+const weekDays: { value: WeekDay; label: string; full: string }[] = [
+    { value: 0 as WeekDay, label: 'S', full: 'Sunday' },
+    { value: 1 as WeekDay, label: 'M', full: 'Monday' },
+    { value: 2 as WeekDay, label: 'T', full: 'Tuesday' },
+    { value: 3 as WeekDay, label: 'W', full: 'Wednesday' },
+    { value: 4 as WeekDay, label: 'T', full: 'Thursday' },
+    { value: 5 as WeekDay, label: 'F', full: 'Friday' },
+    { value: 6 as WeekDay, label: 'S', full: 'Saturday' },
 ];
 
 export const WeekDaySelector = ({ value, onChange }: WeekDaySelectorProps) => {
-    const toggleDay = (day: number) => {
+    const toggleDay = (day: WeekDay) => {
         if (value.includes(day)) {
             onChange(value.filter(d => d !== day));
         } else {
-            onChange([...value, day].sort());
+            onChange([...value, day].sort((a, b) => (a as any) - (b as any)));
         }
     };
 

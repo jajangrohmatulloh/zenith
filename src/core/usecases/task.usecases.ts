@@ -1,4 +1,4 @@
-import { Task, RepeatType, SubTask } from '../domain/task.entity';
+import { Task, RepeatType, SubTask, MonthlyRepeatType, WeekDay, MonthlyDay, WeekOccurrence } from '../domain/task.entity';
 import { ITaskRepository } from '../domain/task.repository';
 
 export class TaskUseCases {
@@ -18,14 +18,14 @@ export class TaskUseCases {
             repeat?: RepeatType;
             repeatInterval?: number;
             repeatEndDate?: number;
-            repeatWeekDays?: number[];
-            repeatMonthlyType?: string;
-            repeatMonthlyDay?: number | string;
-            repeatMonthlyWeekOccurrence?: number | string;
-            repeatMonthlyWeekDay?: number;
+            repeatWeekDays?: WeekDay[];
+            repeatMonthlyType?: MonthlyRepeatType;
+            repeatMonthlyDay?: MonthlyDay;
+            repeatMonthlyWeekOccurrence?: WeekOccurrence;
+            repeatMonthlyWeekDay?: WeekDay;
             repeatYearlyType?: string;
             repeatYearlyMonth?: number;
-            repeatYearlyDay?: number | string;
+            repeatYearlyDay?: MonthlyDay;
             subtasks?: SubTask[];
             order?: number;
         } = {}

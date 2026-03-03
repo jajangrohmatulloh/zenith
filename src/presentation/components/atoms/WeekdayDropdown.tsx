@@ -5,19 +5,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Check } from 'lucide-react';
 import { cn } from './Button';
 
+import { WeekDay } from '../../../core/domain/task.entity';
+
 interface WeekdayDropdownProps {
-    value: number;
-    onChange: (value: number) => void;
+    value: WeekDay;
+    onChange: (value: WeekDay) => void;
 }
 
-const weekDays = [
-    { value: 0, label: 'Sunday' },
-    { value: 1, label: 'Monday' },
-    { value: 2, label: 'Tuesday' },
-    { value: 3, label: 'Wednesday' },
-    { value: 4, label: 'Thursday' },
-    { value: 5, label: 'Friday' },
-    { value: 6, label: 'Saturday' },
+const weekDays: { value: WeekDay; label: string }[] = [
+    { value: 0 as WeekDay, label: 'Sunday' },
+    { value: 1 as WeekDay, label: 'Monday' },
+    { value: 2 as WeekDay, label: 'Tuesday' },
+    { value: 3 as WeekDay, label: 'Wednesday' },
+    { value: 4 as WeekDay, label: 'Thursday' },
+    { value: 5 as WeekDay, label: 'Friday' },
+    { value: 6 as WeekDay, label: 'Saturday' },
 ];
 
 export const WeekdayDropdown = ({ value, onChange }: WeekdayDropdownProps) => {
