@@ -1,14 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import {
     DndContext,
     DragEndEvent,
-    DragOverlay,
-    DragStartEvent,
-    DropAnimation,
     MeasuringStrategy,
     PointerSensor,
     closestCenter,
@@ -22,12 +19,10 @@ import { useTask } from '../../context/task-context';
 import { TaskItem } from '../molecules/TaskItem';
 import { cn } from '../atoms/Button';
 import { isTaskOnDate } from '../../../core/utils/date.utils';
-import { Task } from '../../../core/domain/task.entity';
 
 export const TaskList = () => {
     const { tasks, loading, selectedDate, setSelectedDate, reorderTasks } = useTask();
     const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
-    const [activeTask, setActiveTask] = useState<Task | null>(null);
 
     // Require a 5px movement before drag activates — prevents accidental drags on click/tap
     const sensors = useSensors(
@@ -35,11 +30,6 @@ export const TaskList = () => {
             activationConstraint: { distance: 5 },
         })
     );
-
-    const dropAnimation: DropAnimation = {
-        duration: 200,
-        easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
-    };
 
     const measuring = {
         droppable: { strategy: MeasuringStrategy.Always },
@@ -72,20 +62,12 @@ export const TaskList = () => {
         return (b.createdAt || 0) - (a.createdAt || 0);
     });
 
-    const handleDragStart = (event: DragStartEvent) => {
-        const dragged = sortedTasks.find(t => t.id === event.active.id);
-        setActiveTask(dragged ?? null);
-    };
-
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
         if (over && active.id !== over.id) {
             reorderTasks(active.id as string, over.id as string);
         }
-        setActiveTask(null);
     };
-
-    const handleDragCancel = () => setActiveTask(null);
 
     const handleMoveUp = (taskId: string, index: number) => {
         if (index > 0) {
@@ -159,41 +141,27 @@ export const TaskList = () => {
                     collisionDetection={closestCenter}
                     measuring={measuring}
                     modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-                    onDragStart={handleDragStart}
                     onDragEnd={handleDragEnd}
-                    onDragCancel={handleDragCancel}
                 >
                     <SortableContext
                         items={sortedTasks.map(t => t.id)}
                         strategy={verticalListSortingStrategy}
                     >
-                        <AnimatePresence mode="popLayout" initial={false}>
-                            {sortedTasks.map((task, index) => {
-                                const isFirst = index === 0;
-                                const isLast = index === sortedTasks.length - 1;
-                                return (
-                                    <TaskItem
-                                        key={task.id}
-                                        task={task}
-                                        isDraggable
-                                        onMoveUp={isFirst ? undefined : () => handleMoveUp(task.id, index)}
-                                        onMoveDown={isLast ? undefined : () => handleMoveDown(task.id, index)}
-                                        showReorderButtons
-                                    />
-                                );
-                            })}
-                        </AnimatePresence>
+                        {sortedTasks.map((task, index) => {
+                            const isFirst = index === 0;
+                            const isLast = index === sortedTasks.length - 1;
+                            return (
+                                <TaskItem
+                                    key={task.id}
+                                    task={task}
+                                    isDraggable
+                                    onMoveUp={isFirst ? undefined : () => handleMoveUp(task.id, index)}
+                                    onMoveDown={isLast ? undefined : () => handleMoveDown(task.id, index)}
+                                    showReorderButtons
+                                />
+                            );
+                        })}
                     </SortableContext>
-
-                    {/* Elevated ghost card while dragging — kept inside the list bounds */}
-                    <DragOverlay dropAnimation={dropAnimation} modifiers={[restrictToVerticalAxis, restrictToParentElement]}>
-                        {activeTask ? (
-                            <div className="shadow-xl shadow-black/20 dark:shadow-black/50 ring-2 ring-indigo-400/50 dark:ring-indigo-500/40 rounded-[28px]">
-                                <TaskItem task={activeTask} isDraggable />
-                            </div>
-                        ) : null}
-                    </DragOverlay>
-
                 </DndContext>
 
                 {filteredTasks.length === 0 && (
