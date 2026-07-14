@@ -17,16 +17,22 @@ import { cn } from '../atoms/Button';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+
 interface TaskItemProps {
     task: Task | SubTask;
     isSubtask?: boolean;
     onToggleOverride?: (id: string) => void;
     onUpdateOverride?: (id: string, updates: Partial<Task | SubTask>) => void;
     onDeleteOverride?: (id: string) => void;
+    /** Enables drag-to-reorder via a grip handle */
     isDraggable?: boolean;
+    /** Callbacks for keyboard/touch accessible Up/Down reordering */
+    onMoveUp?: () => void;
+    onMoveDown?: () => void;
+    showReorderButtons?: boolean;
 }
 
-export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, onDeleteOverride, isDraggable = false }: TaskItemProps) => {
+export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, onDeleteOverride, isDraggable = false, onMoveUp, onMoveDown, showReorderButtons = false }: TaskItemProps) => {
     const { toggleTask, deleteTask, updateTask } = useTask();
     const taskAsTask = task as Task;
     const taskAsSubtask = task as SubTask;
@@ -61,11 +67,10 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
         disabled: !isDraggable,
     });
 
-    const style = {
+    const dragStyle = isDraggable ? {
         transform: CSS.Translate.toString(transform),
         transition,
-        opacity: isDragging ? 0 : 1,
-    };
+    } : undefined;
 
     const handleEditStart = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -153,15 +158,16 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
         ? new Date(task.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
         : null;
 
-    const todoContent = (
+    return (
+        <>
         <motion.div
             ref={isDraggable ? setNodeRef : undefined}
-            style={isDraggable ? style : undefined}
+            style={dragStyle}
             layout
             layoutId={task.id}
             initial={{ opacity: 0, scale: 0.98, y: 10 }}
             animate={{
-                opacity: isDragging ? 0 : 1,
+                opacity: 1,
                 scale: 1,
                 y: 0,
             }}
@@ -173,23 +179,31 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
             }}
             className={cn(
                 'group flex flex-col gap-0 p-1.5 rounded-[28px] border transition-all duration-300',
-                isExpanded ? 'bg-white/60 dark:bg-slate-900/60 shadow-xl border-indigo-200/50 dark:border-indigo-900/30 backdrop-blur-xl' : 'bg-white/40 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800/60 shadow-sm hover:shadow-md hover:bg-white/80 dark:hover:bg-slate-900/80 backdrop-blur-md',
-                task.completed && !isExpanded ? 'opacity-60 bg-slate-50/50 dark:bg-slate-900/20 grayscale-[0.2]' : 'opacity-100',
-                isDragging ? 'z-40' : 'z-auto'
+                isDragging
+                    ? 'bg-transparent border-dashed border-2 border-slate-300 dark:border-slate-600 shadow-none'
+                    : isExpanded
+                        ? 'bg-white/60 dark:bg-slate-900/60 shadow-xl border-indigo-200/50 dark:border-indigo-900/30 backdrop-blur-xl'
+                        : 'bg-white/40 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800/60 shadow-sm hover:shadow-md hover:bg-white/80 dark:hover:bg-slate-900/80 backdrop-blur-md',
+                task.completed && !isExpanded && !isDragging ? 'opacity-60 grayscale-[0.2]' : '',
             )}
         >
+            {/* Only render content when not being dragged — show empty placeholder slot */}
+            {!isDragging && (
+            <>
             <div className="flex items-center gap-3 p-3.5 px-4">
-                <div className="flex items-center gap-3">
-                    <div
-                        {...attributes}
-                        {...listeners}
-                        className={cn(
-                            'cursor-grab active:cursor-grabbing text-slate-300 dark:text-slate-600 transition-opacity -ml-2',
-                            isDraggable ? 'opacity-100 group-hover:opacity-100' : 'opacity-0 group-hover:opacity-100'
-                        )}
-                    >
-                        <GripVertical className="w-4 h-4" />
-                    </div>
+                <div className="flex items-center gap-2">
+                    {/* LinkedIn-style drag handle — always visible on the left */}
+                    {isDraggable && (
+                        <div
+                            {...attributes}
+                            {...listeners}
+                            className="cursor-grab active:cursor-grabbing flex-shrink-0 text-slate-300 dark:text-slate-600 hover:text-indigo-400 dark:hover:text-indigo-500 transition-colors touch-none select-none"
+                            title="Drag to reorder"
+                            aria-label="Drag to reorder task"
+                        >
+                            <GripVertical className="w-5 h-5" />
+                        </div>
+                    )}
                     <Checkbox
                         checked={task.completed}
                         onChange={() => handleSubtaskToggle()}
@@ -619,12 +633,9 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
                     </motion.div>
                 )}
             </AnimatePresence>
+            </>
+            )}
         </motion.div>
-    );
-
-    return (
-        <>
-            {todoContent}
             {/* Delete Confirmation Dialog */}
             <ConfirmDialog
                 isOpen={showDeleteConfirm}
