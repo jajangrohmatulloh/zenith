@@ -79,8 +79,8 @@ export const TaskItem = ({ task, isSubtask, onToggleOverride, onUpdateOverride, 
         isDragging && isDraggable
             ? 'shadow-lg shadow-indigo-500/15 dark:shadow-indigo-500/25 ring-1 ring-indigo-300/50 dark:ring-indigo-500/40 bg-white dark:bg-slate-900 pointer-events-none'
             : isExpanded
-                ? 'bg-white/60 dark:bg-slate-900/60 shadow-xl border-indigo-200/50 dark:border-indigo-900/30 backdrop-blur-xl'
-                : 'bg-white/40 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800/60 shadow-sm hover:shadow-md hover:bg-white/80 dark:hover:bg-slate-900/80 backdrop-blur-md',
+                ? cn('bg-white/60 dark:bg-slate-900/60 shadow-xl border-indigo-200/50 dark:border-indigo-900/30', !isSubtask && 'backdrop-blur-xl')
+                : cn('bg-white/40 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800/60 shadow-sm hover:shadow-md hover:bg-white/80 dark:hover:bg-slate-900/80', !isSubtask && 'backdrop-blur-md'),
         task.completed && !isExpanded && !isDragging ? 'opacity-60 grayscale-[0.2]' : '',
     );
 
