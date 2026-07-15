@@ -18,6 +18,16 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Password recovery
+
+The sign-in screen includes a **Forgot Password?** flow. It sends Supabase users to
+`/auth/callback?type=recovery`, where they can choose a new password.
+
+Before deploying, add each app origin to Supabase **Authentication → URL Configuration → Redirect URLs**:
+
+- `http://localhost:3000/auth/callback?type=recovery`
+- `https://your-production-domain/auth/callback?type=recovery`
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More

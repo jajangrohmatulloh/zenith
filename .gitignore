@@ -41,3 +41,4 @@ yarn-error.log*
 next-env.d.ts
 Updating Task Labels and Icons.md
 supabase-migration-rename.sql
+.*

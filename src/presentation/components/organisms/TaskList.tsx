@@ -1,66 +1,38 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
-import { DndContext, DragEndEvent, DragOverlay, useSensor, useSensors, PointerSensor, MeasuringStrategy, DropAnimation, Modifier, DragStartEvent, DragMoveEvent, DragCancelEvent, rectIntersection } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import {
+    DndContext,
+    DragEndEvent,
+    MeasuringStrategy,
+    PointerSensor,
+    closestCenter,
+    useSensor,
+    useSensors,
+} from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { useTask } from '../../context/task-context';
 
 import { TaskItem } from '../molecules/TaskItem';
-import { Badge } from '../atoms/Badge';
 import { cn } from '../atoms/Button';
 import { isTaskOnDate } from '../../../core/utils/date.utils';
-
-// Custom modifier to offset the dragged item so cursor position matches grab point
-const createCursorModifier = (offsetY: number) => {
-    const modifier: Modifier = ({ transform }) => {
-        return {
-            ...transform,
-            y: transform.y + offsetY,
-        };
-    };
-    return modifier;
-};
 
 export const TaskList = () => {
     const { tasks, loading, selectedDate, setSelectedDate, reorderTasks } = useTask();
     const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
-    const [activeId, setActiveId] = useState<string | null>(null);
-    const [cursorOffset, setCursorOffset] = useState(0);
 
-    // Configure sensor for instant drag activation
+    // Require a 5px movement before drag activates — prevents accidental drags on click/tap
     const sensors = useSensors(
         useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 0, // Instant activation for immediate feedback
-            },
+            activationConstraint: { distance: 5 },
         })
     );
 
-    // Custom drop animation
-    const dropAnimation: DropAnimation = {
-        duration: 200,
-        easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
-    };
-
-    // Configure measuring for real-time sliding
     const measuring = {
-        droppable: {
-            strategy: MeasuringStrategy.Always,
-        },
-    };
-
-    const handleDragStart = (event: any) => {
-        setActiveId(event.active.id as string);
-
-        // Calculate cursor offset from top of element
-        const node = event.active.element as HTMLElement | null;
-        if (node) {
-            const rect = node.getBoundingClientRect();
-            const offsetY = event.active.event.clientY - rect.top;
-            setCursorOffset(offsetY - 40);
-        }
+        droppable: { strategy: MeasuringStrategy.Always },
     };
 
     // Calculate stats from ALL tasks (before filtering)
@@ -92,19 +64,22 @@ export const TaskList = () => {
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
-
         if (over && active.id !== over.id) {
             reorderTasks(active.id as string, over.id as string);
         }
-        setActiveId(null);
     };
 
-    const handleDragCancel = () => {
-        setActiveId(null);
+    const handleMoveUp = (taskId: string, index: number) => {
+        if (index > 0) {
+            reorderTasks(taskId, sortedTasks[index - 1].id);
+        }
     };
 
-    // Find the active task for the overlay
-    const activeTask = activeId ? sortedTasks.find(t => t.id === activeId) : null;
+    const handleMoveDown = (taskId: string, index: number) => {
+        if (index < sortedTasks.length - 1) {
+            reorderTasks(taskId, sortedTasks[index + 1].id);
+        }
+    };
 
 
     if (loading) {
@@ -160,32 +135,33 @@ export const TaskList = () => {
 
             </div>
 
-            <div className="flex flex-col gap-3 min-h-[300px]">
+            <div className="flex flex-col gap-3 min-h-[300px] overflow-hidden">
                 <DndContext
-                    collisionDetection={rectIntersection}
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                    onDragCancel={handleDragCancel}
                     sensors={sensors}
+                    collisionDetection={closestCenter}
                     measuring={measuring}
+                    modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+                    onDragEnd={handleDragEnd}
                 >
-                    <SortableContext items={sortedTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                        <AnimatePresence mode="popLayout" initial={false}>
-                            {sortedTasks.map((task) => (
-                                <TaskItem key={task.id} task={task} isDraggable />
-                            ))}
-                        </AnimatePresence>
-                    </SortableContext>
-                    <DragOverlay
-                        dropAnimation={dropAnimation}
-                        modifiers={[createCursorModifier(cursorOffset)]}
+                    <SortableContext
+                        items={sortedTasks.map(t => t.id)}
+                        strategy={verticalListSortingStrategy}
                     >
-                        {activeTask ? (
-                            <div className="transform scale-105 shadow-xl">
-                                <TaskItem task={activeTask} isDraggable />
-                            </div>
-                        ) : null}
-                    </DragOverlay>
+                        {sortedTasks.map((task, index) => {
+                            const isFirst = index === 0;
+                            const isLast = index === sortedTasks.length - 1;
+                            return (
+                                <TaskItem
+                                    key={task.id}
+                                    task={task}
+                                    isDraggable
+                                    onMoveUp={isFirst ? undefined : () => handleMoveUp(task.id, index)}
+                                    onMoveDown={isLast ? undefined : () => handleMoveDown(task.id, index)}
+                                    showReorderButtons
+                                />
+                            );
+                        })}
+                    </SortableContext>
                 </DndContext>
 
                 {filteredTasks.length === 0 && (

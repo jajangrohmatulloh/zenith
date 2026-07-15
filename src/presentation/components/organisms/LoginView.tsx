@@ -164,6 +164,7 @@ export const LoginView = ({ onBack }: LoginViewProps) => {
                                 <Input
                                     type="email"
                                     placeholder="name@example.com"
+                                    autoComplete="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="pl-11 bg-transparent dark:bg-transparent border-slate-200/60 dark:border-slate-700/50 text-slate-800 dark:text-white focus:border-indigo-500/50 [color-scheme:light] dark:[color-scheme:dark] rounded-2xl h-12"
@@ -197,6 +198,7 @@ export const LoginView = ({ onBack }: LoginViewProps) => {
                                     <Input
                                         type="password"
                                         placeholder="••••••••"
+                                        autoComplete={isRegistering ? 'new-password' : 'current-password'}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         className="pl-11 bg-transparent dark:bg-transparent border-slate-200/60 dark:border-slate-700/50 text-slate-800 dark:text-white focus:border-indigo-500/50 [color-scheme:light] dark:[color-scheme:dark] rounded-2xl h-12"
