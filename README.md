@@ -28,6 +28,9 @@ Before deploying, add each app origin to Supabase **Authentication → URL Confi
 - `http://localhost:3000/auth/callback?type=recovery`
 - `https://your-production-domain/auth/callback?type=recovery`
 
+Branded Supabase templates for sign-up confirmation, password recovery, email changes,
+and password-change notifications are in [`supabase/email-templates`](supabase/email-templates/README.md).
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
